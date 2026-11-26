@@ -12,7 +12,7 @@
 /* Bố cục: một cột cho điện thoại; màn hình chơi = hình gợi ý + dải nốt ở trên, bàn phím to cố định ở dưới */
 :root{
   --paper:#FFF6E6; --card:#FFFFFF; --ink:#2A2341; --soft:#6E6684; --line:#EEDFC4;
-  --accent:#2F5BEA; --accent-ink:#FFFFFF; --good:#18A05A; --bad:#E5484D; --skin:#FFD9B8;
+  --accent:#2F5BEA; --accent-ink:#FFFFFF; --good:#18A05A; --bad:#E5484D; --skin:#FFD9B8; --lh:#8A5A2B;
   --c0:#E53935; --c2:#FB8C00; --c4:#F5C518; --c5:#3DA845; --c7:#1E88E5; --c9:#5E35B1; --c11:#D81B78;
   --display:"Baloo 2",ui-rounded,system-ui,sans-serif;
   --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -72,18 +72,21 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .lesson.guide svg{width:100%;max-width:170px;height:auto}
 .stars{color:#F2B705;letter-spacing:2px;font-size:1rem}
 .stars .off{color:var(--line)}
-.opt{display:flex;align-items:center;gap:10px;font-size:.95rem;color:var(--soft)}
-.opt input{width:22px;height:22px}
+.settings{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.opt{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:start;font-size:.95rem}
+.opt input{width:22px;height:22px;margin:0}
+.opt small{grid-column:2;color:var(--soft);line-height:1.4}
 
 /* ---------- Màn chơi ---------- */
 #play{height:100%;display:flex;flex-direction:column}
 .topbar{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left))}
 .icon-btn{border:0;background:var(--card);border-radius:14px;min-width:44px;height:44px;padding:0 12px;font-weight:800;box-shadow:0 1px 0 var(--line)}
+.icon-btn svg{width:22px;height:22px;display:block}
 .topbar h2{font-size:1.2rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:0 max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left))}
 .progress i{display:block;height:100%;width:0;background:var(--good);transition:width .25s}
 .stage{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left))}
-.now{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:10px 14px;border:2px solid var(--line);min-height:116px}
+.now{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:10px 14px;border:2px solid var(--line);min-height:116px;cursor:pointer}
 .now.noart{grid-template-columns:1fr}
 .staff,.hand{width:110px;height:96px}
 .target{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -98,6 +101,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .nb{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;color:#fff;background:var(--c);opacity:.45;transition:transform .2s,opacity .2s}
 .nb.big{font-size:1.15rem;font-family:var(--display)}
 .nb.y{color:var(--ink)}
+.nb.lh{border:3px solid var(--lh)}
 .nb.hid{background:#B9B3C9;color:#fff}
 .nb.brk{margin-left:14px}
 .nb.cur{opacity:1;transform:scale(1.25);box-shadow:0 0 0 3px var(--paper),0 0 0 6px var(--c)}
@@ -109,8 +113,24 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .pill{border:0;border-radius:999px;padding:10px 16px;background:var(--card);font-weight:800;box-shadow:0 1px 0 var(--line)}
 .pill.primary{background:var(--accent);color:var(--accent-ink)}
+.pill.toggle[aria-pressed="true"]{background:var(--good);color:#fff}
 .pill:disabled{opacity:.45}
 .mini-status{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--soft);padding:0 2px}
+.rotate-hint{display:none}
+
+/* Nốt rơi */
+.fallbox{flex:1;min-height:140px;position:relative;border-radius:16px;overflow:hidden;background:#221C36}
+.fallbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;color:#fff;font-weight:800;font-family:var(--display);font-size:1.1rem;pointer-events:none;text-shadow:0 1px 2px #0008}
+.hud .fb{font-size:1.4rem;color:#FFE27A}
+.fall-start{position:absolute;inset:0;display:grid;place-items:center;padding:12px;background:#221C36E6;color:#fff;text-align:center}
+.fall-start div{display:flex;flex-direction:column;gap:10px;align-items:center}
+.fall-start p{margin:0;color:#CFC8E6;max-width:32ch;line-height:1.4}
+.fall-start .row{flex-direction:row;flex-wrap:wrap;justify-content:center}
+.fall-start .pill{color:var(--ink);min-width:80px}
+.fall-start .pill.primary{color:var(--accent-ink)}
+#play.fall .now,#play.fall .lane,#play.fall #hear-note,#play.fall #hear-phrase{display:none}
+#play.fall .stage{padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right))}
 
 /* Bàn phím */
 .kb-wrap{flex:0 0 auto;height:clamp(150px,36vh,280px);padding:0 max(6px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));background:#2A2341}
@@ -120,16 +140,19 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .key.white .dot{width:60%;max-width:34px;height:8px;border-radius:4px;background:var(--c)}
 .key.white .fb{width:clamp(16px,5vw,24px);height:clamp(16px,5vw,24px);border-radius:50%;background:var(--ink);color:#fff;font-size:clamp(.6rem,2.6vw,.8rem);font-weight:800;display:grid;place-items:center}
 .key.white .fb:empty{display:none}
-.key.white .fb.lh{background:#8A5A2B}
-.key.black{position:absolute;top:8px;height:58%;background:#1A1528;border-radius:0 0 7px 7px;z-index:2;border:2px solid #2A2341;border-top:0}
+.key.white .fb.lh{background:var(--lh)}
+.key.black{position:absolute;top:8px;height:58%;background:#1A1528;border-radius:0 0 7px 7px;z-index:2;border:2px solid #2A2341;border-top:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.key.black .bn{font-size:clamp(.5rem,2vw,.7rem);color:#CFC8E6;font-weight:800}
 .key.target.white{background:color-mix(in srgb,var(--c) 30%,#FFFDF8);box-shadow:inset 0 -10px 0 var(--c)}
+.key.target.black{background:#5E4FA0}
 .key.target.white .nm{transform:scale(1.15)}
 .key.down.white{background:#E6E1F2}
 .key.down.black{background:#4B3F6B}
 .key.good.white{background:color-mix(in srgb,var(--good) 45%,#fff)}
+.key.good.black{background:var(--good)}
 .key.wrong.white{background:color-mix(in srgb,var(--bad) 45%,#fff)}
 .key.wrong.black{background:var(--bad)}
-.key.target.white::before{content:"";position:absolute;top:-2px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--c);animation:bob 1s ease-in-out infinite}
+.key.target::before{content:"";position:absolute;top:-2px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--c,#B9B3C9);animation:bob 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(6px)}}
 
 /* Lớp phủ: hoàn thành + hướng dẫn */
@@ -139,7 +162,8 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .done-card .stars{font-size:2.6rem;letter-spacing:6px}
 .done-card .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .guide-card{background:var(--card);border-radius:26px;padding:20px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px}
-.guide-card .step-no{font-size:.8rem;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:.08em}
+.guide-card .step-no{font-size:.8rem;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center}
+.guide-card .step-no .pill{padding:6px 12px;font-size:.85rem;text-transform:none;letter-spacing:0;color:var(--ink)}
 .guide-card h2{font-size:1.6rem}
 .guide-card .illus{display:flex;justify-content:center;gap:10px;min-height:20px}
 .guide-card .illus svg{max-width:100%;height:auto}
@@ -149,10 +173,8 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .gdots{display:flex;gap:6px;justify-content:center}
 .gdots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
 .gdots i.on{background:var(--ink)}
-.icon-btn svg{width:22px;height:22px;display:block}
-.rotate-hint{display:none}
 
-/* ---------- Điện thoại nằm ngang: hình gợi ý bên trái, dải nốt + nút bên phải, phím to ở dưới ---------- */
+/* ---------- Điện thoại nằm ngang ---------- */
 @media (orientation:landscape) and (max-height:560px){
   .topbar{padding-top:max(4px,env(safe-area-inset-top));padding-bottom:4px}
   .topbar h2{font-size:1rem}
@@ -175,6 +197,11 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
   .key.white .nm{font-size:clamp(.7rem,2.2vw,1.1rem)}
   .key.white .fb{width:22px;height:22px;font-size:.78rem}
   #rotate{display:none}
+  #play.fall .stage{display:flex;flex-direction:column;gap:4px}
+  #play.fall .msg,#play.fall .mini-status,#play.fall .fall-start p{display:none}
+  #play.fall .fall-start h2{font-size:1.1rem}
+  #play.fall .fall-start div{gap:6px}
+  .fallbox{min-height:90px}
 }
 @media (orientation:portrait){
   .rotate-hint{display:block;text-align:center;font-size:.85rem;color:var(--soft)}
@@ -199,7 +226,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
     <div class="modes" role="group" aria-label="Cách nối với đàn">
       <button class="mode" id="mode-mic" data-mode="mic" aria-pressed="false">
         <b>Micro</b>
-        <small>Mọi điện thoại, mọi loại đàn. Đặt điện thoại gần đàn, phòng yên tĩnh.</small>
+        <small>Mọi điện thoại, mọi loại đàn. Bé đánh đàn, điện thoại nghe tiếng và ghi nhận nốt.</small>
       </button>
       <button class="mode" id="mode-midi" data-mode="midi" aria-pressed="false">
         <b>Dây USB / MIDI</b>
@@ -229,6 +256,18 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
     <div class="lessons" id="lessons"></div>
   </section>
 
+  <section class="settings">
+    <h2 class="section-label" style="margin:0">Cài đặt</h2>
+    <label class="opt"><input type="checkbox" id="opt-tts"> <span>Đọc hướng dẫn thành tiếng</span>
+      <small id="tts-note">Giọng tiếng Việt đọc hướng dẫn, gợi ý khi bé đánh sai và kết quả. Chạm vào ô nốt trên màn chơi để nghe đọc lại.</small></label>
+    <label class="opt"><input type="checkbox" id="opt-acc" checked> <span>Nhạc đệm hợp âm</span>
+      <small>Khi bé đánh đúng giai điệu, điện thoại đệm hợp âm theo (bài hát và nốt rơi).</small></label>
+    <label class="opt"><input type="checkbox" id="opt-phones"> <span>Điện thoại đang cắm tai nghe</span>
+      <small>Khi dùng Micro mà không cắm tai nghe, nhạc đệm sẽ tắt để micro chỉ nghe tiếng đàn, không nghe nhầm tiếng điện thoại.</small></label>
+    <label class="opt"><input type="checkbox" id="lenient" checked> <span>Đánh đúng tên nốt ở quãng khác vẫn tính là đúng</span>
+      <small>Bỏ chọn nếu muốn bé phải đánh đúng phím ở đúng chỗ.</small></label>
+  </section>
+
   <section class="tip">
     <svg class="mini-kb" viewBox="0 0 120 70" aria-hidden="true">
       <g stroke="#2A2341" stroke-width="2" fill="#FFFDF8">
@@ -243,8 +282,6 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
       <p>Đô là phím trắng nằm ngay bên trái nhóm 2 phím đen. Bắt đầu từ nốt Đô ở giữa đàn (gần tên hãng đàn). Có thể dán giấy màu lên phím đàn thật cho giống màu trong bài.</p>
     </div>
   </section>
-
-  <label class="opt"><input type="checkbox" id="lenient" checked> Đánh đúng tên nốt ở quãng khác vẫn tính là đúng</label>
 </main>
 
 <!-- ============ MÀN CHƠI ============ -->
@@ -259,7 +296,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
   </div>
   <div class="progress"><i id="prog"></i></div>
   <div class="stage">
-    <div class="now" id="now">
+    <div class="now" id="now" title="Chạm để nghe đọc">
       <svg class="staff" id="staff" viewBox="0 0 110 96" aria-hidden="true"></svg>
       <svg class="hand" id="hand" viewBox="0 0 100 96" aria-hidden="true" hidden></svg>
       <div class="target">
@@ -268,14 +305,30 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
         <span class="finger" id="tfinger"></span>
       </div>
     </div>
+    <div class="fallbox" id="fallbox" hidden>
+      <canvas id="fallcv"></canvas>
+      <div class="hud"><span id="hud-score">0 điểm</span><span class="fb" id="hud-fb"></span><span id="hud-combo"></span></div>
+      <div class="fall-start" id="fall-start">
+        <div>
+          <h2 id="fall-title">Nốt rơi</h2>
+          <p>Nốt rơi xuống đúng phím của nó. Khi nốt chạm vạch sáng ở đáy thì bé đánh phím đó.</p>
+          <div class="row">
+            <button class="pill" data-bpm="50">Chậm</button>
+            <button class="pill" data-bpm="70">Vừa</button>
+            <button class="pill" data-bpm="95">Nhanh</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="msg" id="msg" aria-live="polite"></div>
     <div class="lane" id="lane"></div>
     <div class="controls">
       <button class="pill" id="hear-note">Nghe nốt này</button>
       <button class="pill" id="hear-phrase">Nghe cả câu</button>
+      <button class="pill toggle" id="acc-btn" aria-pressed="true">Nhạc đệm</button>
       <button class="pill" id="restart">Chơi lại</button>
     </div>
-    <div class="rotate-hint" id="rotate-hint">Xoay ngang điện thoại để phím đàn to hơn.</div>
+    <div class="rotate-hint">Xoay ngang điện thoại để phím đàn to hơn.</div>
     <div class="mini-status" id="mini-status">
       <span id="mode-label"></span>
       <div class="meter" id="play-meter" aria-hidden="true"><i class="meter-fill"></i></div>
@@ -300,7 +353,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 
 <div class="overlay" id="guide" hidden>
   <div class="guide-card" role="dialog" aria-labelledby="g-title">
-    <span class="step-no" id="g-no"></span>
+    <span class="step-no"><span id="g-no"></span><button class="pill" id="g-read">Đọc to</button></span>
     <h2 id="g-title"></h2>
     <div class="illus" id="g-illus"></div>
     <ul id="g-text"></ul>
@@ -320,8 +373,8 @@ const NAMES = ['Đô','Đô#','Rê','Rê#','Mi','Fa','Fa#','Sol','Sol#','La','La
 const NATURAL = {0:1,2:1,4:1,5:1,7:1,9:1,11:1};
 const LETTER = {C:0,D:2,E:4,F:5,G:7,A:9,B:11};
 const NOTE_HEX = {0:'#E53935',2:'#FB8C00',4:'#F5C518',5:'#3DA845',7:'#1E88E5',9:'#5E35B1',11:'#D81B78'};
-const colorOf = m => NATURAL[m%12] ? `var(--c${m%12})` : '#8A84A0';
-const hexOf = m => NOTE_HEX[m%12] || '#8A84A0';
+const colorOf = m => NATURAL[m%12] ? `var(--c${m%12})` : '#7D76A0';
+const hexOf = m => NOTE_HEX[m%12] || '#7D76A0';
 const isYellow = m => m%12 === 4;
 function noteName(m){
   const oct = Math.floor(m/12)-1;
@@ -329,7 +382,8 @@ function noteName(m){
   if (oct <= 3) n += ' thấp'; else if (oct >= 5) n += ' cao';
   return n;
 }
-function parseNote(s){ return LETTER[s[0]] + (parseInt(s.slice(1),10)+1)*12; }
+function parseNote(s){ const sharp = s[1]==='#' ? 1 : 0; return LETTER[s[0]] + sharp + (parseInt(s.slice(1+sharp),10)+1)*12; }
+function parseTok(t){ const [n, d] = t.split(':'); return {m: parseNote(n), d: d ? parseFloat(d) : 1}; }
 function staffStep(m){ // bậc tính từ Đô giữa (C4 = 0)
   const pcToStep = {0:0,2:1,4:2,5:3,7:4,9:5,11:6};
   const pc = m%12, oct = Math.floor(m/12)-1;
@@ -341,6 +395,23 @@ const RH = {1:60,2:62,3:64,4:65,5:67};
 const LH = {5:48,4:50,3:52,2:53,1:55};
 const HAND_NAME = {R:'tay phải', L:'tay trái'};
 
+/* ---------------- Hợp âm đệm ---------------- */
+const CHORDS = {
+  C:{pcs:[0,4,7], notes:[48,52,55]}, G:{pcs:[7,11,2], notes:[43,47,50]}, F:{pcs:[5,9,0], notes:[41,45,48]},
+  Am:{pcs:[9,0,4], notes:[45,48,52]}, Dm:{pcs:[2,5,9], notes:[50,53,57]}, E:{pcs:[4,8,11], notes:[40,44,47]},
+};
+const PRIO = {c:['C','G','F','Am','Dm','E'], am:['Am','E','C','G','F','Dm']};
+function harmonize(seq, breaks, key='c'){ // giữ hợp âm cũ nếu nốt nằm trong đó, đầu câu thì chọn lại
+  const out = []; let prev = null;
+  seq.forEach((m,i) => {
+    const pc = m%12;
+    if (prev && !breaks.has(i) && CHORDS[prev].pcs.includes(pc)){ out.push(prev); return; }
+    const c = PRIO[key].find(n => CHORDS[n].pcs.includes(pc)) || prev || PRIO[key][0];
+    out.push(c); prev = c;
+  });
+  return out;
+}
+
 /* ---------------- Bài học ---------------- */
 function phrases(str, fn){ // "a b | c d" -> mỗi mục qua fn, kèm vị trí ngắt câu
   const out = {items:[], breaks:new Set()};
@@ -350,6 +421,10 @@ function phrases(str, fn){ // "a b | c d" -> mỗi mục qua fn, kèm vị trí 
   }));
   return out;
 }
+function fingerLesson(l, kind='finger'){
+  const p = phrases(l.spec, t => ({hand:t[0], f:+t[1], hold:t.endsWith('*'), m:(t[0]==='R'?RH:LH)[+t[1]]}));
+  return {...l, kind, steps:p.items, seq:p.items.map(s=>s.m), breaks:p.breaks};
+}
 const FINGER_LESSONS = [
   {id:'f-r1', title:'Chào ngón tay phải', sub:'Ngón 1 đến 5 rồi đi xuống', level:1, spec:'R1 R2 R3 R4 R5 | R5 R4 R3 R2 R1'},
   {id:'f-r2', title:'Ngón đôi bạn', sub:'Hai ngón cạnh nhau thay phiên', level:1, spec:'R1 R2 R1 R2 | R2 R3 R2 R3 | R3 R4 R3 R4 | R4 R5 R4 R5'},
@@ -358,28 +433,66 @@ const FINGER_LESSONS = [
   {id:'f-l2', title:'Tay trái nhảy', sub:'5, 3, 1 rồi quay lại', level:2, spec:'L5 L3 L1 L3 L5 | L5 L4 L5 L4 | L2 L1 L2 L1 | L5'},
   {id:'f-r4', title:'Ngón 4 và 5 khỏe lên', sub:'Tập hai ngón yếu nhất', level:3, spec:'R3 R4 R5 R4 R3 | R4 R5 R4 R5 R4 | R5 R4 R3 R2 R1'},
   {id:'f-b1', title:'Hai tay thay nhau', sub:'Tay trái đi lên, tay phải đi tiếp', level:3, spec:'L5 L4 L3 L2 L1 | R1 R2 R3 R4 R5 | R5 R4 R3 R2 R1 | L1 L2 L3 L4 L5'},
-].map(l => {
-  const p = phrases(l.spec, t => ({hand:t[0], f:+t[1], m:(t[0]==='R'?RH:LH)[+t[1]]}));
-  return {...l, kind:'finger', steps:p.items, seq:p.items.map(s=>s.m), breaks:p.breaks};
-});
-const SONG_LESSONS = [
+].map(l => fingerLesson(l));
+/* Hai tay: L5* = tay trái ngón 5 đánh nốt trầm rồi giữ, tay phải đánh giai điệu bên trên */
+const TWO_LESSONS = [
+  {id:'t-1', title:'Giữ Đô, đánh Đô Rê Mi', sub:'Tay trái giữ Đô thấp', level:1,
+   spec:'L5* R1 R2 R3 | L5* R3 R2 R1 | L5* R1 R2 R3 R4 R5 | L5* R5 R4 R3 R2 R1'},
+  {id:'t-2', title:'Đổi nốt trầm', sub:'Tay trái đổi giữa Đô thấp và Sol thấp', level:2,
+   spec:'L5* R1 R2 R3 | L1* R2 R3 R2 | L5* R3 R2 R1 | L1* R2 R2 | L5* R1'},
+  {id:'t-hot', title:'Bánh nóng hai tay', sub:'Hot Cross Buns', level:2,
+   spec:'L5* R3 R2 R1 | L5* R3 R2 R1 | L5* R1 R1 R1 R1 | L1* R2 R2 R2 R2 | L5* R3 R2 R1'},
+  {id:'t-mary', title:'Chú cừu nhỏ hai tay', sub:'Mary Had a Little Lamb', level:3,
+   spec:'L5* R3 R2 R1 R2 | L5* R3 R3 R3 | L1* R2 R2 R2 | L5* R3 R5 R5 | L5* R3 R2 R1 R2 | L5* R3 R3 R3 R3 | L1* R2 R2 R3 R2 | L5* R1'},
+  {id:'t-joy', title:'Bài ca vui hai tay', sub:'Ode to Joy', level:3,
+   spec:'L5* R3 R3 R4 R5 | L1* R5 R4 R3 R2 | L5* R1 R1 R2 R3 | L1* R3 R2 R2 | L5* R3 R3 R4 R5 | L1* R5 R4 R3 R2 | L5* R1 R1 R2 R3 | L1* R2 R1 R1'},
+].map(l => fingerLesson(l, 'two'));
+/* Bài hát: "C4:2" = nốt Đô giữa dài 2 phách (mặc định 1 phách), "|" = ngắt câu */
+const SONG_DATA = [
   {id:'warm', title:'Làm quen Đô Rê Mi', sub:'Đi lên rồi đi xuống', level:1, cpos:true,
-   notes:'C4 D4 E4 | E4 D4 C4 | C4 D4 E4 F4 G4 | G4 F4 E4 D4 C4'},
+   notes:'C4 D4 E4:2 | E4 D4 C4:2 | C4 D4 E4 F4 G4:2 | G4 F4 E4 D4 C4:2'},
+  {id:'hot', title:'Bánh nóng', sub:'Hot Cross Buns', level:1, cpos:true,
+   notes:'E4 D4 C4:2 | E4 D4 C4:2 | C4:.5 C4:.5 C4:.5 C4:.5 D4:.5 D4:.5 D4:.5 D4:.5 | E4 D4 C4:2'},
   {id:'five', title:'Năm ngón tay', sub:'Nhảy cách một phím', level:1, cpos:true,
-   notes:'C4 E4 G4 E4 C4 | D4 F4 D4 | E4 G4 E4 | C4 E4 G4 C4'},
+   notes:'C4 E4 G4 E4 C4:2 | D4 F4 D4:2 | E4 G4 E4:2 | C4 E4 G4 C4:2'},
   {id:'mary', title:'Chú cừu nhỏ', sub:'Mary Had a Little Lamb', level:1, cpos:true,
-   notes:'E4 D4 C4 D4 E4 E4 E4 | D4 D4 D4 | E4 G4 G4 | E4 D4 C4 D4 E4 E4 E4 E4 | D4 D4 E4 D4 C4'},
+   notes:'E4 D4 C4 D4 E4 E4 E4:2 | D4 D4 D4:2 | E4 G4 G4:2 | E4 D4 C4 D4 E4 E4 E4 E4 | D4 D4 E4 D4 C4:4'},
   {id:'star', title:'Ngôi sao nhỏ', sub:'Twinkle Twinkle Little Star', level:2, cpos:true,
-   notes:'C4 C4 G4 G4 A4 A4 G4 | F4 F4 E4 E4 D4 D4 C4 | G4 G4 F4 F4 E4 E4 D4 | G4 G4 F4 F4 E4 E4 D4 | C4 C4 G4 G4 A4 A4 G4 | F4 F4 E4 E4 D4 D4 C4'},
+   notes:'C4 C4 G4 G4 A4 A4 G4:2 | F4 F4 E4 E4 D4 D4 C4:2 | G4 G4 F4 F4 E4 E4 D4:2 | G4 G4 F4 F4 E4 E4 D4:2 | C4 C4 G4 G4 A4 A4 G4:2 | F4 F4 E4 E4 D4 D4 C4:2'},
   {id:'butterfly', title:'Kìa con bướm vàng', sub:'Nhạc thiếu nhi quen thuộc', level:2, cpos:true,
-   notes:'C4 D4 E4 C4 | C4 D4 E4 C4 | E4 F4 G4 | E4 F4 G4 | G4 A4 G4 F4 E4 C4 | G4 A4 G4 F4 E4 C4 | C4 G3 C4 | C4 G3 C4'},
+   notes:'C4 D4 E4 C4 | C4 D4 E4 C4 | E4 F4 G4:2 | E4 F4 G4:2 | G4:.5 A4:.5 G4:.5 F4:.5 E4 C4 | G4:.5 A4:.5 G4:.5 F4:.5 E4 C4 | C4 G3 C4:2 | C4 G3 C4:2'},
   {id:'joy', title:'Bài ca vui', sub:'Ode to Joy (Beethoven)', level:2, cpos:true,
-   notes:'E4 E4 F4 G4 G4 F4 E4 D4 | C4 C4 D4 E4 E4 D4 D4 | E4 E4 F4 G4 G4 F4 E4 D4 | C4 C4 D4 E4 D4 C4 C4'},
+   notes:'E4 E4 F4 G4 G4 F4 E4 D4 | C4 C4 D4 E4 E4:1.5 D4:.5 D4:2 | E4 E4 F4 G4 G4 F4 E4 D4 | C4 C4 D4 E4 D4:1.5 C4:.5 C4:2'},
+  {id:'london', title:'Cầu London', sub:'London Bridge Is Falling Down', level:2, cpos:true,
+   notes:'G4:1.5 A4:.5 G4 F4 E4 F4 G4:2 | D4 E4 F4:2 | E4 F4 G4:2 | G4:1.5 A4:.5 G4 F4 E4 F4 G4:2 | D4:2 G4:2 E4 C4:3'},
+  {id:'row', title:'Chèo thuyền', sub:'Row, Row, Row Your Boat', level:2, cpos:true,
+   notes:'C4:1.5 C4:1.5 C4 D4:.5 E4:1.5 | E4 D4:.5 E4 F4:.5 G4:3 | C5:.5 C5:.5 C5:.5 G4:.5 G4:.5 G4:.5 E4:.5 E4:.5 E4:.5 C4:.5 C4:.5 C4:.5 | G4 F4:.5 E4 D4:.5 C4:3'},
+  {id:'mac', title:'Nông trại vui vẻ', sub:'Old MacDonald Had a Farm', level:2, cpos:false,
+   notes:'C4 C4 C4 G3 A3 A3 G3:2 | E4 E4 D4 D4 C4:3 | G3 C4 C4 C4 G3 A3 A3 G3:2 | E4 E4 D4 D4 C4:3'},
+  {id:'moon', title:'Dưới ánh trăng', sub:'Au Clair de la Lune', level:2, cpos:false,
+   notes:'C4 C4 C4 D4 E4:2 D4:2 | C4 E4 D4 D4 C4:4 | C4 C4 C4 D4 E4:2 D4:2 | C4 E4 D4 D4 C4:4 | D4 D4 D4 D4 A3:2 A3:2 | D4 C4 B3 A3 G3:4 | C4 C4 C4 D4 E4:2 D4:2 | C4 E4 D4 D4 C4:4'},
   {id:'jingle', title:'Leng keng', sub:'Jingle Bells', level:3, cpos:true,
-   notes:'E4 E4 E4 | E4 E4 E4 | E4 G4 C4 D4 E4 | F4 F4 F4 F4 F4 E4 E4 E4 E4 D4 D4 E4 D4 G4 | E4 E4 E4 | E4 E4 E4 | E4 G4 C4 D4 E4 | F4 F4 F4 F4 F4 E4 E4 E4 G4 G4 F4 D4 C4'},
+   notes:'E4 E4 E4:2 | E4 E4 E4:2 | E4 G4 C4:1.5 D4:.5 E4:4 | F4 F4 F4:1.5 F4:.5 F4 E4 E4 E4:.5 E4:.5 E4 D4 D4 E4 D4:2 G4:2 | E4 E4 E4:2 | E4 E4 E4:2 | E4 G4 C4:1.5 D4:.5 E4:4 | F4 F4 F4:1.5 F4:.5 F4 E4 E4 E4:.5 E4:.5 G4 G4 F4 D4 C4:4'},
+  {id:'yankee', title:'Chàng Yankee', sub:'Yankee Doodle', level:3, cpos:false,
+   notes:'C4 C4 D4 E4 C4 E4 D4 G3 | C4 C4 D4 E4 C4:2 B3:2 | C4 C4 D4 E4 F4 E4 D4 C4 | B3 G3 A3 B3 C4:2 C4:2'},
   {id:'bday', title:'Chúc mừng sinh nhật', sub:'Happy Birthday', level:3, cpos:false,
-   notes:'G3 G3 A3 G3 C4 B3 | G3 G3 A3 G3 D4 C4 | G3 G3 G4 E4 C4 B3 A3 | F4 F4 E4 C4 D4 C4'},
-].map(l => { const p = phrases(l.notes, parseNote); return {...l, kind:'song', seq:p.items, breaks:p.breaks}; });
+   notes:'G3:.75 G3:.25 A3 G3 C4 B3:2 | G3:.75 G3:.25 A3 G3 D4 C4:2 | G3:.75 G3:.25 G4 E4 C4 B3 A3:2 | F4:.75 F4:.25 E4 C4 D4 C4:2'},
+  {id:'lullaby', title:'Bài hát ru', sub:'Brahms Lullaby', level:3, cpos:false,
+   notes:'E4:.5 E4:.5 G4:2 | E4:.5 E4:.5 G4:2 | E4:.5 G4:.5 C5 B4:1.5 A4:.5 A4 G4 | D4:.5 E4:.5 F4 D4 D4:.5 E4:.5 F4:2 | D4:.5 F4:.5 B4:.5 A4:.5 G4 B4 C5:3'},
+  {id:'xmas', title:'Mừng Giáng Sinh', sub:'We Wish You a Merry Christmas', level:3, cpos:false,
+   notes:'G3 C4 C4:.5 D4:.5 C4:.5 B3:.5 A3 A3 | A3 D4 D4:.5 E4:.5 D4:.5 C4:.5 B3 G3 | G3 E4 E4:.5 F4:.5 E4:.5 D4:.5 C4 A3 | G3:.5 G3:.5 A3 D4 B3 C4:2'},
+  {id:'grace', title:'Ơn diệu kỳ', sub:'Amazing Grace', level:3, cpos:false,
+   notes:'G3 C4:2 E4:.5 C4:.5 E4:2 D4 C4:2 A3 G3:2 | G3 C4:2 E4:.5 C4:.5 E4:2 D4 G4:3 | E4 G4:1.5 E4:.5 G4:.5 E4:.5 C4:2 G3 A3:1.5 C4:.5 C4:.5 A3:.5 G3:2 | G3 C4:2 E4:.5 C4:.5 E4:2 D4 C4:3'},
+  {id:'elise', title:'Gửi Elise', sub:'Für Elise (Beethoven), có phím đen', level:3, cpos:false, key:'am',
+   notes:'E5:.5 D#5:.5 E5:.5 D#5:.5 E5:.5 B4:.5 D5:.5 C5:.5 A4:1.5 | C4:.5 E4:.5 A4:.5 B4:1.5 | E4:.5 G#4:.5 B4:.5 C5:1.5 | E4:.5 E5:.5 D#5:.5 E5:.5 D#5:.5 E5:.5 B4:.5 D5:.5 C5:.5 A4:1.5 | C4:.5 E4:.5 A4:.5 B4:1.5 | E4:.5 C5:.5 B4:.5 A4:2'},
+];
+const SONG_LESSONS = SONG_DATA.map(l => {
+  const p = phrases(l.notes, parseTok);
+  const seq = p.items.map(x=>x.m);
+  return {...l, kind:'song', seq, durs:p.items.map(x=>x.d), breaks:p.breaks, chords:harmonize(seq, p.breaks, l.key)};
+});
+const FALL_LESSONS = ['hot','mary','star','butterfly','joy','london','row','mac','jingle','bday']
+  .map(id => { const s = SONG_LESSONS.find(x => x.id===id); return {...s, id:'fall-'+id, kind:'fall', sub:s.sub}; });
 const FIVE = 'C4 D4 E4 F4 G4', EIGHT = 'C4 D4 E4 F4 G4 A4 B4 C5';
 const READ_LESSONS = [
   {id:'r-n5', show:'name',  pool:FIVE,  title:'Tìm phím theo tên', sub:'Đô đến Sol, không có phím sáng', level:1},
@@ -396,8 +509,12 @@ const EAR_LESSONS = [
 const CATS = [
   {key:'finger', label:'5 ngón tay', items:FINGER_LESSONS,
    desc:'Học đặt tay đúng và dùng đủ 5 ngón. Mỗi phím ghi số ngón cần dùng. Xem "Cách đặt tay" trước khi tập.'},
+  {key:'two', label:'Hai tay', items:TWO_LESSONS,
+   desc:'Tay trái đánh một nốt trầm rồi giữ phím, tay phải đánh giai điệu bên trên. Nên tập sau bài "Hai tay thay nhau". Số ngón màu nâu là tay trái.'},
   {key:'song', label:'Bài hát', items:SONG_LESSONS,
-   desc:'Đánh theo từng nốt của bài hát. Phím cần đánh sáng lên, bé đánh đúng thì sang nốt tiếp.'},
+   desc:'Đánh theo từng nốt của bài hát. Phím cần đánh sáng lên, bé đánh đúng thì sang nốt tiếp và điện thoại đệm hợp âm theo.'},
+  {key:'fall', label:'Nốt rơi', items:FALL_LESSONS,
+   desc:'Trò chơi: nốt rơi xuống theo nhịp, khi chạm vạch sáng thì bé đánh phím đó. Đánh đúng lúc được nhiều điểm hơn.'},
   {key:'read', label:'Đọc nốt', items:READ_LESSONS,
    desc:'Không có phím sáng. Bé tự tìm phím theo tên nốt, hoặc nhìn nốt trên khuông nhạc để đánh.'},
   {key:'ear', label:'Nghe & đánh lại', items:EAR_LESSONS,
@@ -422,26 +539,61 @@ function ensureCtx(){
   return ctx;
 }
 let ignoreMicUntil = 0;
-function tone(m, dur=0.9, when=0){
+/* Mỗi tiếng điện thoại phát ra sẽ tạm khoá micro để micro không nghe nhầm thành tiếng đàn của bé
+   (trừ khi cắm tai nghe, hoặc tiếng gõ nhịp rất ngắn) */
+function tone(m, dur=0.9, when=0, vol=0.45, block=true){
   ensureCtx();
   const t = ctx.currentTime + when, f = 440*Math.pow(2,(m-69)/12);
   const g = ctx.createGain();
-  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.45,t+0.012);
-  g.gain.exponentialRampToValueAtTime(0.12,t+0.25); g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+0.012);
+  g.gain.exponentialRampToValueAtTime(vol*0.27,t+0.25); g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
   g.connect(master);
   const o1 = ctx.createOscillator(); o1.type='triangle'; o1.frequency.value=f; o1.connect(g);
   const g2 = ctx.createGain(); g2.gain.value=0.25; g2.connect(g);
   const o2 = ctx.createOscillator(); o2.type='sine'; o2.frequency.value=f*2; o2.connect(g2);
   o1.start(t); o2.start(t); o1.stop(t+dur+0.05); o2.stop(t+dur+0.05);
-  ignoreMicUntil = Math.max(ignoreMicUntil, performance.now() + (when+dur)*1000 + 250);
+  if (block && !phones) ignoreMicUntil = Math.max(ignoreMicUntil, performance.now() + (when+dur)*1000 + 250);
+}
+function click(at, accent){ // tiếng gõ nhịp ngắn, không khoá micro
+  ensureCtx();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'square'; o.frequency.value = accent ? 1800 : 1300;
+  g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(accent ? 0.12 : 0.06, at+0.002);
+  g.gain.exponentialRampToValueAtTime(0.0005, at+0.03);
+  o.connect(g); g.connect(master); o.start(at); o.stop(at+0.04);
+}
+function accActive(){ return acc && (mode !== 'mic' || phones); }
+function playChord(name){
+  if (!accActive() || !CHORDS[name]) return;
+  CHORDS[name].notes.forEach(m => tone(m, 1.3, 0, 0.11));
+}
+
+/* ---------------- Giọng đọc tiếng Việt ---------------- */
+let viVoice = null;
+function pickVoice(){
+  if (!window.speechSynthesis) return;
+  const vs = speechSynthesis.getVoices();
+  viVoice = vs.find(v => /^vi/i.test(v.lang)) || null;
+}
+if (window.speechSynthesis){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text, force=false){
+  if (!window.speechSynthesis || (!force && !ttsOn) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/#/g, ' thăng'));
+  u.lang = 'vi-VN'; if (viVoice) u.voice = viVoice; u.rate = 0.95;
+  u.onend = u.onerror = () => { ignoreMicUntil = Math.max(ignoreMicUntil, performance.now() + 300); };
+  speechSynthesis.speak(u);
 }
 
 /* ---------------- Trạng thái ---------------- */
 let mode = store.get('mode', null);
 let lenient = store.get('lenient', true);
+let acc = store.get('acc', true);
+let ttsOn = store.get('tts', false);
+let phones = store.get('phones', false);
 let tab = store.get('tab', 'finger');
 let lesson = null, seq = [], breaks = new Set(), idx = 0, mistakes = 0, wrongHere = 0, playing = false, busy = false;
-let ear = null;
+let ear = null, fall = null;
 const $ = id => document.getElementById(id);
 
 /* ---------------- Hình bàn tay & bàn phím minh hoạ (SVG) ---------------- */
@@ -516,6 +668,7 @@ const GUIDE = [
 ];
 let gi = 0;
 function openGuide(i=0){ gi = i; renderGuide(); $('guide').hidden = false; }
+function guideText(){ const g = GUIDE[gi]; return g.title + '. ' + g.text.join(' '); }
 function renderGuide(){
   const g = GUIDE[gi];
   $('g-no').textContent = `Bước ${gi+1} / ${GUIDE.length}`;
@@ -526,19 +679,21 @@ function renderGuide(){
   $('g-dots').innerHTML = GUIDE.map((_,i) => `<i class="${i===gi?'on':''}"></i>`).join('');
   $('g-prev').disabled = gi === 0;
   $('g-next').textContent = gi === GUIDE.length-1 ? 'Tập ngay' : 'Tiếp ›';
+  speak(guideText());
 }
+$('g-read').addEventListener('click', () => speak(guideText(), true));
 $('g-prev').addEventListener('click', () => { if (gi>0){ gi--; renderGuide(); } });
 $('g-next').addEventListener('click', () => {
   if (gi < GUIDE.length-1){ gi++; renderGuide(); }
   else { $('guide').hidden = true; startLesson('finger', 0); }
 });
-$('g-close').addEventListener('click', () => { $('guide').hidden = true; });
+$('g-close').addEventListener('click', () => { $('guide').hidden = true; window.speechSynthesis?.cancel(); });
 
 /* ---------------- Trang chủ ---------------- */
 function renderTabs(){
   const box = $('tabs'); box.innerHTML = '';
   CATS.forEach(c => {
-    const b = document.createElement('button'); b.className = 'tab'; b.role = 'tab';
+    const b = document.createElement('button'); b.className = 'tab'; b.setAttribute('role','tab');
     b.textContent = c.label; b.setAttribute('aria-selected', String(c.key===tab));
     b.addEventListener('click', () => { tab = c.key; store.set('tab', tab); renderTabs(); renderLessons(); });
     box.appendChild(b);
@@ -547,10 +702,10 @@ function renderTabs(){
 function renderLessons(){
   const cat = catOf(tab), box = $('lessons'); box.innerHTML = '';
   $('panel-desc').textContent = cat.desc;
-  if (tab === 'finger'){
+  if (tab === 'finger' || tab === 'two'){
     const g = document.createElement('button'); g.className = 'lesson guide';
     g.innerHTML = `<h3>Cách đặt tay</h3><div class="sub">6 bước: tư thế, số ngón, khum tay, vị trí Đô hai tay</div><svg viewBox="0 0 200 96"><g>${handSVG('L',0,'',false)}</g><g transform="translate(100 0)">${handSVG('R',0,'',false)}</g></svg>`;
-    g.addEventListener('click', () => openGuide(0));
+    g.addEventListener('click', () => openGuide(tab === 'two' ? 3 : 0));
     box.appendChild(g);
   }
   cat.items.forEach((s,i) => {
@@ -581,6 +736,7 @@ function markMode(){
   $('sens-row').hidden = mode!=='mic';
   $('mode-label').textContent = {mic:'Micro', midi:'Dây MIDI', tap:'Bấm màn hình'}[mode] || '';
   $('play-meter').hidden = mode!=='mic';
+  updateAccBtn();
 }
 async function chooseMode(m){
   mode = m; store.set('mode', m); markMode();
@@ -591,8 +747,19 @@ async function chooseMode(m){
   markMode();
 }
 document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => chooseMode(b.dataset.mode)));
-$('lenient').checked = lenient;
-$('lenient').addEventListener('change', e => { lenient = e.target.checked; store.set('lenient', lenient); });
+function bindOpt(id, get, set){ const el = $(id); el.checked = get(); el.addEventListener('change', () => set(el.checked)); }
+bindOpt('lenient', () => lenient, v => { lenient = v; store.set('lenient', v); });
+bindOpt('opt-acc', () => acc, v => { acc = v; store.set('acc', v); updateAccBtn(); });
+bindOpt('opt-phones', () => phones, v => { phones = v; store.set('phones', v); updateAccBtn(); });
+bindOpt('opt-tts', () => ttsOn, v => {
+  ttsOn = v; store.set('tts', v);
+  if (v){
+    if (!window.speechSynthesis){ $('tts-note').textContent = 'Trình duyệt này không có chức năng đọc thành tiếng.'; return; }
+    pickVoice();
+    speak('Xin chào bé! Mình cùng học đàn nhé.', true);
+    if (!viVoice) $('tts-note').textContent = 'Chưa thấy giọng tiếng Việt trên máy. Android: Cài đặt, Chuyển văn bản thành giọng nói, tải tiếng Việt. iPhone thường có sẵn.';
+  }
+});
 
 /* ---------------- MIDI ---------------- */
 let midiAccess = null;
@@ -675,7 +842,7 @@ function micLoop(){
   noise = rms < noise ? rms : noise + (rms-noise)*0.002;
   const gate = Math.max(GATES[$('sens').value-1], noise*3);
   hist.push(rms); if (hist.length > 8) hist.shift();
-  if (now < ignoreMicUntil){ collecting = false; return; }
+  if (now < ignoreMicUntil || (!phones && window.speechSynthesis?.speaking)){ collecting = false; return; }
   const ref = Math.min(...hist.slice(0, 5));
   if (rms > gate && rms > ref*1.8 && now - lastOnset > 150){
     lastOnset = now; collecting = true; cand = -1; candN = 0;
@@ -702,6 +869,7 @@ $('sens').addEventListener('change', e => store.set('sens', +e.target.value));
 let keyEls = {};
 function keyRange(notes){
   let lo = Math.min(...notes), hi = Math.max(...notes), up = true;
+  if (!NATURAL[lo%12]) lo--; if (!NATURAL[hi%12]) hi++;
   const whites = () => { let n=0; for (let m=lo; m<=hi; m++) if (NATURAL[m%12]) n++; return n; };
   while (whites() < 10){
     if (up){ do hi++; while (!NATURAL[hi%12]); } else { do lo--; while (!NATURAL[lo%12]); }
@@ -726,6 +894,7 @@ function buildKeyboard(lo, hi, badges={}){
       const b = document.createElement('div'); b.className='key black'; b.dataset.m = bm;
       const w = 100/n;
       b.style.left = `calc(${(i+1)*w}% - ${w*0.3}%)`; b.style.width = `${w*0.6}%`;
+      if (seq.includes(bm)){ const bn = document.createElement('span'); bn.className='bn'; bn.textContent = NAMES[bm%12]; b.appendChild(bn); }
       kb.appendChild(b); keyEls[bm] = b;
     }
   });
@@ -754,6 +923,7 @@ function drawStaff(m, colored=true){
     const stemUp = st < 6;
     out += `<line x1="${stemUp?cx+6.5:cx-6.5}" x2="${stemUp?cx+6.5:cx-6.5}" y1="${y}" y2="${stemUp?y-30:y+30}" stroke="#2A2341" stroke-width="1.8"/>`;
     out += `<ellipse cx="${cx}" cy="${y}" rx="7.5" ry="5.4" transform="rotate(-20 ${cx} ${y})" fill="${colored ? hexOf(m) : '#2A2341'}" stroke="#2A2341" stroke-width="1.5"/>`;
+    if (!NATURAL[m%12]) out += `<text x="${cx-20}" y="${y+5}" font-size="16" font-weight="800" text-anchor="middle" fill="#2A2341" font-family="sans-serif">#</text>`;
   }
   svg.innerHTML = out;
 }
@@ -782,39 +952,61 @@ function randomSeq(pool, n){
   }
   return out;
 }
+const hasAcc = () => lesson && (lesson.kind === 'song' || lesson.kind === 'fall');
+function updateAccBtn(){
+  const b = $('acc-btn');
+  b.hidden = !hasAcc();
+  b.setAttribute('aria-pressed', String(accActive()));
+  b.textContent = accActive() ? 'Nhạc đệm: bật' : 'Nhạc đệm: tắt';
+}
+$('acc-btn').addEventListener('click', () => {
+  if (mode === 'mic' && !phones){
+    say('Đang dùng micro nên nhạc đệm tắt để micro chỉ nghe tiếng đàn. Cắm tai nghe rồi bật "Điện thoại đang cắm tai nghe" trong Cài đặt.', '');
+    return;
+  }
+  acc = !acc; store.set('acc', acc); $('opt-acc').checked = acc; updateAccBtn();
+});
 async function startLesson(catKey, i){
-  ensureCtx(); stopDemo();
+  ensureCtx(); stopDemo(); fallStop();
   if (!mode){ mode = 'tap'; store.set('mode','tap'); }
   if (mode==='mic' && !micOn) await startMic();
   if (mode==='midi' && !midiAccess) await startMidi();
-  markMode();
   lesson = catOf(catKey).items[i]; lesson.cat = catKey; lesson.index = i;
+  markMode();
   idx = 0; mistakes = 0; wrongHere = 0; playing = true; busy = false; ear = null;
   breaks = lesson.breaks || new Set();
   let badges = {};
-  if (lesson.kind === 'finger'){
+  const k = lesson.kind;
+  if (k === 'finger' || k === 'two'){
     seq = lesson.seq;
-    lesson.steps.forEach(s => { badges[s.m] = {f:s.f, hand:s.hand}; });
-    Object.entries(lesson.steps.some(s=>s.hand==='R') ? RH : {}).forEach(([f,m]) => badges[m] = {f:+f, hand:'R'});
-    Object.entries(lesson.steps.some(s=>s.hand==='L') ? LH : {}).forEach(([f,m]) => badges[m] = {f:+f, hand:'L'});
-  } else if (lesson.kind === 'song'){
+    if (lesson.steps.some(s=>s.hand==='R')) Object.entries(RH).forEach(([f,m]) => badges[m] = {f:+f, hand:'R'});
+    if (lesson.steps.some(s=>s.hand==='L')) Object.entries(LH).forEach(([f,m]) => badges[m] = {f:+f, hand:'L'});
+  } else if (k === 'song' || k === 'fall'){
     seq = lesson.seq;
     if (lesson.cpos) Object.entries(RH).forEach(([f,m]) => badges[m] = {f:+f, hand:'R'});
-  } else if (lesson.kind === 'read'){
+  } else if (k === 'read'){
     seq = randomSeq(lesson.poolM, lesson.count);
-  } else if (lesson.kind === 'ear'){
+  } else if (k === 'ear'){
     ear = {round:0, full: randomSeq(lesson.poolM, lesson.rounds + 1)};
     seq = ear.full.slice(0, 2);
   }
-  const [lo, hi] = keyRange(lesson.kind==='read' || lesson.kind==='ear' ? lesson.poolM : seq);
+  const [lo, hi] = keyRange(k==='read' || k==='ear' ? lesson.poolM : seq);
   buildKeyboard(lo, hi, badges);
   $('song-title').textContent = lesson.title;
-  $('hear-phrase').hidden = lesson.kind !== 'song' && lesson.kind !== 'finger';
-  $('hear-note').textContent = lesson.kind === 'ear' ? 'Nghe lại' : 'Nghe nốt này';
+  $('play').classList.toggle('fall', k === 'fall');
+  $('fallbox').hidden = k !== 'fall';
+  $('hear-phrase').hidden = !(k === 'song' || k === 'finger' || k === 'two');
+  $('hear-note').textContent = k === 'ear' ? 'Nghe lại' : 'Nghe nốt này';
+  $('hear-note').disabled = false;
+  updateAccBtn();
   show('play'); keepAwake();
-  if (lesson.kind === 'ear'){ earStartRound(); return; }
+  if (k === 'ear'){ earStartRound(); return; }
+  if (k === 'fall'){ fallSetup(); return; }
   buildLane(); updateTarget();
-  say(mode==='mic' ? 'Đặt điện thoại gần đàn rồi bắt đầu nhé!' : 'Bắt đầu nhé!', '');
+  const start = k === 'two' ? 'Tay trái đánh nốt trầm, tay phải đánh giai điệu.'
+    : (mode==='mic' ? 'Đặt điện thoại gần đàn rồi bắt đầu nhé!' : 'Bắt đầu nhé!');
+  say(start, '');
+  speak(lesson.title + '. ' + instruction());
 }
 function buildLane(){
   const lane = $('lane'); lane.innerHTML = '';
@@ -823,7 +1015,11 @@ function buildLane(){
     b.className = 'nb' + (breaks.has(i)?' brk':'');
     b.style.setProperty('--c', colorOf(m));
     if (lesson.kind === 'read' || lesson.kind === 'ear'){ b.classList.add('hid','big'); b.textContent = '?'; }
-    else if (lesson.kind === 'finger'){ b.classList.add('big'); if (isYellow(m)) b.classList.add('y'); b.textContent = lesson.steps[i].f; }
+    else if (lesson.kind === 'finger' || lesson.kind === 'two'){
+      const st = lesson.steps[i];
+      b.classList.add('big'); if (isYellow(m)) b.classList.add('y'); if (st.hand === 'L') b.classList.add('lh');
+      b.textContent = st.f;
+    }
     else { if (isYellow(m)) b.classList.add('y'); b.textContent = NAMES[m%12]; }
     lane.appendChild(b);
   });
@@ -833,6 +1029,20 @@ function reveal(i){
   const m = seq[i];
   b.classList.remove('hid','big'); if (isYellow(m)) b.classList.add('y'); b.textContent = NAMES[m%12];
 }
+function holdText(){ return mode === 'mic' ? 'rồi thả ra, tay phải đánh tiếp' : 'rồi giữ phím'; }
+function instruction(){ // câu đọc cho bé: nốt / ngón cần đánh lúc này
+  const m = seq[idx]; if (m == null || !lesson) return '';
+  const k = lesson.kind;
+  if (k === 'song') return `Bé đánh nốt ${noteName(m)}.`;
+  if (k === 'finger' || k === 'two'){
+    const st = lesson.steps[idx];
+    return `${HAND_NAME[st.hand]}, ngón ${st.f}, nốt ${noteName(m)}${st.hold ? ', ' + holdText() : ''}.`;
+  }
+  if (k === 'read') return lesson.show === 'name' ? `Tìm phím ${noteName(m)}.` : 'Nhìn nốt nhạc trên khuông rồi đánh.';
+  if (k === 'ear') return busy ? 'Nghe nhé.' : 'Đến lượt bé, đánh lại các nốt vừa nghe.';
+  return '';
+}
+$('now').addEventListener('click', () => speak(instruction(), true));
 function updateTarget(){
   const lane = $('lane'), bubbles = lane.children;
   for (let i=0;i<bubbles.length;i++){
@@ -850,16 +1060,17 @@ function updateTarget(){
   if (k === 'song'){
     setArt('staff'); drawStaff(m); $('tlbl').textContent = 'Bé đánh nốt'; setBig(noteName(m), m);
     $('tfinger').textContent = (lesson.cpos && Object.values(RH).includes(m)) ? `Tay phải, ngón số ${Object.keys(RH).find(f=>RH[f]===m)}`
-      : (m < 60 ? 'Phím nằm bên trái nốt Đô giữa' : (m > 67 ? 'Phím nằm bên phải nốt Sol' : ''));
-  } else if (k === 'finger'){
+      : (!NATURAL[m%12] ? 'Phím đen' : m < 60 ? 'Phím nằm bên trái nốt Đô giữa' : (m > 67 ? 'Phím nằm bên phải nốt Sol' : ''));
+  } else if (k === 'finger' || k === 'two'){
     const st = lesson.steps[idx];
     setArt('hand'); $('hand').innerHTML = handSVG(st.hand, st.f, hexOf(m), true);
-    $('tlbl').textContent = HAND_NAME[st.hand]; setBig(`Ngón ${st.f}`, m);
-    $('tfinger').textContent = `Đánh nốt ${noteName(m)}`;
+    $('tlbl').textContent = HAND_NAME[st.hand] + (st.hold ? ' · nốt trầm' : ''); setBig(`Ngón ${st.f}`, m);
+    $('tfinger').textContent = `Đánh nốt ${noteName(m)}${st.hold ? ' ' + holdText() : ''}`;
   } else if (k === 'read'){
     $('tlbl').textContent = `Câu ${idx+1} / ${seq.length}`;
     if (lesson.show === 'name'){
       setArt('none'); setBig(noteName(m), m); $('tfinger').textContent = 'Bé tự tìm phím này trên đàn';
+      if (idx > 0) speak(instruction());
     } else {
       setArt('staff'); drawStaff(m, false); setBig('?'); $('tfinger').textContent = 'Nhìn nốt trên khuông rồi đánh';
     }
@@ -867,7 +1078,10 @@ function updateTarget(){
 }
 const PRAISE = ['Đúng rồi!','Giỏi quá!','Hay lắm!','Tuyệt vời!','Chính xác!'];
 const praise = () => PRAISE[Math.floor(Math.random()*PRAISE.length)];
-function say(t, cls){ const el = $('msg'); el.textContent = t; el.className = 'msg' + (cls?' '+cls:''); }
+function say(t, cls){
+  const el = $('msg'); el.textContent = t; el.className = 'msg' + (cls?' '+cls:'');
+  if (cls === 'bad') speak(t);
+}
 function shakeCur(){ const cur = $('lane').children[idx]; if (!cur) return; cur.classList.remove('shake'); void cur.offsetWidth; cur.classList.add('shake'); }
 
 /* ---------------- Xử lý phím bé đánh ---------------- */
@@ -878,10 +1092,13 @@ function handleInput(m, src){
   if (src === 'tap') tone(m);
   if (!playing || !lesson || busy) return;
   if (lesson.kind === 'ear') return earInput(m);
+  if (lesson.kind === 'fall') return fallHit(m, src);
   const target = seq[idx];
   if (matches(m, target)){
     flashKey(target, 'good', 300);
+    if (lesson.kind === 'song') playChord(lesson.chords[idx]);
     if (lesson.kind === 'read'){ reveal(idx); say(`${praise()} Đó là ${noteName(target)}.`, 'good'); }
+    else if (lesson.steps?.[idx]?.hold) say(mode === 'mic' ? `${praise()} Giờ tay phải đánh tiếp.` : `${praise()} Giữ phím tay trái, tay phải đánh tiếp.`, 'good');
     else say(praise(), 'good');
     idx++; wrongHere = 0;
     if (idx >= seq.length) finish(); else updateTarget();
@@ -889,7 +1106,7 @@ function handleInput(m, src){
   }
   mistakes++; wrongHere++;
   flashKey(m, 'wrong', 400); shakeCur();
-  if (lesson.kind === 'finger'){
+  if (lesson.kind === 'finger' || lesson.kind === 'two'){
     const st = lesson.steps[idx];
     say(`Bé vừa đánh ${noteName(m)}. Dùng ngón ${st.f} ${HAND_NAME[st.hand]} đánh ${noteName(target)} nhé!`, 'bad');
   } else if (lesson.kind === 'read'){
@@ -899,7 +1116,7 @@ function handleInput(m, src){
   } else {
     say(`Bé vừa đánh ${noteName(m)}. Tìm phím ${noteName(target)} nhé!`, 'bad');
   }
-  if (wrongHere === 2) setTimeout(() => tone(target, 1.0), 450);
+  if (wrongHere === 2 && !ttsOn) setTimeout(() => tone(target, 1.0), 450);
 }
 
 /* ---------------- Nghe & đánh lại ---------------- */
@@ -929,7 +1146,7 @@ function earDemo(){
       bubbles[i].classList.add('ping'); setTimeout(() => bubbles[i]?.classList.remove('ping'), 400);
     }, (start + i*step)*1000));
   });
-  demoTimers.push(setTimeout(() => { busy = false; earView('turn'); }, (start + seq.length*step)*1000));
+  demoTimers.push(setTimeout(() => { busy = false; earView('turn'); speak('Đến lượt bé!'); }, (start + seq.length*step)*1000));
 }
 function earInput(m){
   const target = seq[idx], bubbles = $('lane').children;
@@ -946,7 +1163,113 @@ function earInput(m){
   mistakes++; flashKey(m, 'wrong', 400); shakeCur();
   say(`Chưa đúng, nốt đó là ${noteName(target)}. Nghe lại nhé!`, 'bad');
   idx = 0; busy = true;
-  demoTimers.push(setTimeout(() => { for (const b of bubbles) b.classList.remove('done'); earDemo(); }, 1600));
+  demoTimers.push(setTimeout(() => { for (const b of bubbles) b.classList.remove('done'); earDemo(); }, ttsOn ? 3200 : 1600));
+}
+
+/* ---------------- Nốt rơi ---------------- */
+const LOOK = 3.2;          // số phách nhìn thấy trước
+const WIN = 0.35;          // được tính trúng nếu lệch dưới 0,35 giây
+const MIC_LAG = 0.09;      // micro cần ~0,09 giây để nhận ra nốt
+function fallSetup(){
+  let t = 0; const ev = [];
+  seq.forEach((m,i) => { if (i>0 && breaks.has(i)) t += 1; ev.push({m, t, d:lesson.durs[i], i, hit:false, done:false}); t += lesson.durs[i]; });
+  fall = {ev, end:t, running:false, score:0, combo:0, hits:0, perfect:0};
+  $('fall-title').textContent = lesson.title;
+  $('fall-start').hidden = false;
+  $('hud-score').textContent = '0 điểm'; $('hud-combo').textContent = ''; $('hud-fb').textContent = '';
+  $('count').textContent = `0/${ev.length}`; $('prog').style.width = '0%';
+  say('', '');
+  const last = store.get('bpm', 50);
+  document.querySelectorAll('#fall-start [data-bpm]').forEach(b => b.classList.toggle('primary', +b.dataset.bpm === last));
+  requestAnimationFrame(() => fallDraw(-LOOK));
+  speak('Nốt rơi. Chọn tốc độ để bắt đầu.');
+}
+document.querySelectorAll('#fall-start [data-bpm]').forEach(b => b.addEventListener('click', () => fallGo(+b.dataset.bpm)));
+function fallGo(bpm){
+  ensureCtx(); store.set('bpm', bpm);
+  window.speechSynthesis?.cancel();
+  const spb = 60/bpm;
+  Object.assign(fall, {bpm, spb, start: ctx.currentTime + 0.3 + 4*spb, running:true, nextTick:-4});
+  $('fall-start').hidden = true;
+  fall.timer = setInterval(fallTick, 16);
+}
+function fallStop(){ if (fall?.timer){ clearInterval(fall.timer); fall.timer = null; } if (fall) fall.running = false; }
+const beatNow = () => (ctx.currentTime - fall.start) / fall.spb;
+function fallFeedback(text, color){ const el = $('hud-fb'); el.textContent = text; el.style.color = color; clearTimeout(fall.fbT); fall.fbT = setTimeout(() => el.textContent = '', 600); }
+function fallTick(){
+  if (!fall?.running) return;
+  const nb = beatNow(), winB = WIN / fall.spb;
+  while (fall.nextTick <= Math.ceil(fall.end) && fall.start + fall.nextTick*fall.spb < ctx.currentTime + 0.12){
+    const at = fall.start + fall.nextTick*fall.spb;
+    if (at >= ctx.currentTime - 0.01) click(at, fall.nextTick % 4 === 0);
+    fall.nextTick++;
+  }
+  for (const e of fall.ev){
+    if (!e.done && nb - e.t > winB){ e.done = true; fall.combo = 0; fallFeedback('Trượt', '#FF9AA2'); $('hud-combo').textContent = ''; }
+  }
+  const doneN = fall.ev.filter(e => e.done).length;
+  $('count').textContent = `${doneN}/${fall.ev.length}`; $('prog').style.width = (doneN/fall.ev.length*100)+'%';
+  fallDraw(nb);
+  if (doneN === fall.ev.length && nb > fall.end + 1) fallEnd();
+}
+function fallHit(m, src){
+  if (!fall?.running) return;
+  const nb = beatNow() - (src === 'mic' ? MIC_LAG/fall.spb : 0), winB = WIN / fall.spb;
+  let best = null;
+  for (const e of fall.ev){
+    if (e.done) continue;
+    if (e.t - nb > winB) break;
+    if (matches(m, e.m) && Math.abs(nb - e.t) <= winB && (!best || Math.abs(nb-e.t) < Math.abs(nb-best.t))) best = e;
+  }
+  if (!best){ fall.combo = 0; $('hud-combo').textContent = ''; flashKey(m, 'wrong', 300); fallFeedback('Ối!', '#FF9AA2'); return; }
+  best.done = best.hit = true;
+  const dt = Math.abs(nb - best.t) * fall.spb, perfect = dt < 0.12;
+  fall.hits++; if (perfect) fall.perfect++;
+  fall.score += (perfect ? 100 : 50) + fall.combo * 5; fall.combo++;
+  $('hud-score').textContent = `${fall.score} điểm`;
+  $('hud-combo').textContent = fall.combo > 1 ? `Chuỗi ${fall.combo}` : '';
+  fallFeedback(perfect ? 'Tuyệt!' : 'Tốt!', perfect ? '#FFE27A' : '#9FE3B4');
+  flashKey(best.m, 'good', 250);
+  playChord(lesson.chords[best.i]);
+}
+function fallEnd(){
+  fallStop();
+  const total = fall.ev.length, ratio = fall.hits / total;
+  const stars = ratio >= 0.9 ? 3 : ratio >= 0.7 ? 2 : 1;
+  finish(stars, `Trúng ${fall.hits}/${total} nốt, ${fall.perfect} nốt đúng lúc. ${fall.score} điểm.`);
+}
+function fallDraw(nb){
+  const cv = $('fallcv'), r = cv.getBoundingClientRect(); if (!r.width) return;
+  const dpr = window.devicePixelRatio || 1;
+  if (cv.width !== Math.round(r.width*dpr) || cv.height !== Math.round(r.height*dpr)){ cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr); }
+  const c = cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
+  const W = r.width, H = r.height, ppb = (H-10) / LOOK, hitY = H - 6;
+  c.clearRect(0,0,W,H);
+  for (let b = Math.floor(nb); b < nb + LOOK + 1; b++){
+    const y = hitY - (b - nb)*ppb;
+    c.fillStyle = b % 4 === 0 ? '#ffffff22' : '#ffffff0d'; c.fillRect(0, y, W, 1);
+  }
+  const pos = {};
+  for (const m in keyEls){ const kr = keyEls[m].getBoundingClientRect(); pos[m] = {x: kr.left - r.left, w: kr.width}; }
+  for (const e of fall.ev){
+    if (e.t - nb > LOOK + 0.5) break;
+    if (e.done && nb - e.t > 0.6) continue;
+    const p = pos[e.m]; if (!p) continue;
+    const yb = hitY - (e.t - nb)*ppb, h = Math.max(20, e.d*ppb - 4);
+    c.globalAlpha = e.hit ? 0.35 : (e.done ? 0.25 : 1);
+    c.fillStyle = e.done && !e.hit ? '#6F6890' : hexOf(e.m);
+    const x = p.x + 2, w = p.w - 4;
+    c.beginPath(); c.roundRect ? c.roundRect(x, yb - h, w, h, 6) : c.rect(x, yb - h, w, h); c.fill();
+    c.fillStyle = e.m%12 === 4 ? '#2A2341' : '#fff'; c.font = `800 ${Math.min(14, w*0.4)}px Nunito, sans-serif`; c.textAlign = 'center';
+    if (h > 18) c.fillText(NAMES[e.m%12], x + w/2, yb - 6);
+    c.globalAlpha = 1;
+  }
+  c.fillStyle = '#FFE27A'; c.fillRect(0, hitY, W, 3);
+  c.fillStyle = '#FFE27A33'; c.fillRect(0, hitY-8, W, 8);
+  if (nb < 0 && fall.running){
+    c.fillStyle = '#fff'; c.font = '800 48px "Baloo 2", sans-serif'; c.textAlign = 'center';
+    c.fillText(String(Math.ceil(-nb)), W/2, H/2);
+  }
 }
 
 /* ---------------- Nút điều khiển ---------------- */
@@ -960,20 +1283,25 @@ function playPhrase(){
     demoTimers.push(setTimeout(() => { flashKey(seq[i], 'down', 300); bubbles[i]?.classList.add('ping'); setTimeout(()=>bubbles[i]?.classList.remove('ping'),350); }, k*step*1000));
   }
 }
-function finish(){
+function finish(starsIn, textIn){
   playing = false; stopDemo();
-  if (lesson.kind !== 'ear') { idx = seq.length; updateTarget(); }
-  else { $('count').textContent = `${lesson.rounds}/${lesson.rounds}`; $('prog').style.width = '100%'; }
-  const stars = mistakes <= 1 ? 3 : mistakes <= 4 ? 2 : 1;
+  if (lesson.kind === 'ear'){ $('count').textContent = `${lesson.rounds}/${lesson.rounds}`; $('prog').style.width = '100%'; }
+  else if (lesson.kind !== 'fall'){ idx = seq.length; updateTarget(); }
+  const stars = starsIn ?? (mistakes <= 1 ? 3 : mistakes <= 4 ? 2 : 1);
   if (stars > store.get('best:'+lesson.id, 0)) store.set('best:'+lesson.id, stars);
   [60,64,67,72].forEach((m,i) => tone(m, 0.8, i*0.12));
   $('done-stars').innerHTML = '★'.repeat(stars) + `<span class="off">${'★'.repeat(3-stars)}</span>`;
-  $('done-title').textContent = stars===3 ? 'Xuất sắc!' : stars===2 ? 'Giỏi lắm!' : 'Hoàn thành!';
-  $('done-text').textContent = mistakes===0 ? 'Bé không đánh sai nốt nào.' : `Bé đánh sai ${mistakes} lần. Chơi lại để được thêm sao nhé!`;
+  const title = stars===3 ? 'Xuất sắc!' : stars===2 ? 'Giỏi lắm!' : 'Hoàn thành!';
+  const text = textIn ?? (mistakes===0 ? 'Bé không đánh sai nốt nào.' : `Bé đánh sai ${mistakes} lần. Chơi lại để được thêm sao nhé!`);
+  $('done-title').textContent = title; $('done-text').textContent = text;
   $('next').hidden = lesson.index >= catOf(lesson.cat).items.length-1;
   $('done').hidden = false;
+  setTimeout(() => speak(`${title} Bé được ${stars} sao. ${text}`), 700);
 }
-function toList(){ stopDemo(); playing = false; tab = lesson?.cat || tab; renderTabs(); renderLessons(); show('home'); wakeLock?.release?.(); }
+function toList(){
+  stopDemo(); fallStop(); playing = false; window.speechSynthesis?.cancel();
+  tab = lesson?.cat || tab; renderTabs(); renderLessons(); show('home'); wakeLock?.release?.();
+}
 $('hear-note').addEventListener('click', () => {
   if (!lesson) return;
   if (lesson.kind === 'ear'){ if (!busy && playing){ idx = 0; for (const b of $('lane').children) b.classList.remove('done'); earDemo(); } return; }
@@ -985,7 +1313,10 @@ $('back').addEventListener('click', toList);
 $('again').addEventListener('click', () => { $('done').hidden = true; startLesson(lesson.cat, lesson.index); });
 $('next').addEventListener('click', () => { $('done').hidden = true; startLesson(lesson.cat, lesson.index+1); });
 $('to-list').addEventListener('click', () => { $('done').hidden = true; toList(); });
-document.addEventListener('visibilitychange', () => { if (!document.hidden && playing) keepAwake(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && fall?.running){ fallStop(); fallSetup(); }
+  if (!document.hidden && playing) keepAwake();
+});
 /* Xoay ngang: Android vào toàn màn hình rồi khóa hướng ngang; iPhone không cho trang tự xoay nên nhắc bé xoay tay */
 $('rotate').addEventListener('click', async () => {
   try{
@@ -995,7 +1326,10 @@ $('rotate').addEventListener('click', async () => {
     say('Hãy xoay điện thoại nằm ngang. Nếu màn hình không xoay, tắt "Khóa xoay màn hình" trong phần cài đặt nhanh.', '');
   }
 });
-screen.orientation?.addEventListener?.('change', () => { if (playing && lesson && lesson.kind !== 'ear') setTimeout(updateTarget, 200); });
+screen.orientation?.addEventListener?.('change', () => {
+  if (playing && lesson && lesson.kind !== 'ear' && lesson.kind !== 'fall') setTimeout(updateTarget, 200);
+  if (fall && !fall.running && lesson?.kind === 'fall') setTimeout(() => fallDraw(-LOOK), 200);
+});
 
 /* ---------------- Khởi động ---------------- */
 if (!catOf(tab)) tab = 'finger';
