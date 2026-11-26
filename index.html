@@ -258,6 +258,10 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 
   <section class="settings">
     <h2 class="section-label" style="margin:0">Cài đặt</h2>
+    <div class="opt" style="grid-template-columns:1fr">
+      <button class="pill primary" id="test-sound" style="justify-self:start">Thử loa điện thoại</button>
+      <small id="sound-note" style="grid-column:1">Mọi tiếng nhạc (đàn mẫu, nhạc đệm, gõ nhịp, giọng đọc) phát ra từ loa của chính điện thoại đang mở trang.</small>
+    </div>
     <label class="opt"><input type="checkbox" id="opt-tts"> <span>Đọc hướng dẫn thành tiếng</span>
       <small id="tts-note">Giọng tiếng Việt đọc hướng dẫn, gợi ý khi bé đánh sai và kết quả. Chạm vào ô nốt trên màn chơi để nghe đọc lại.</small></label>
     <label class="opt"><input type="checkbox" id="opt-acc" checked> <span>Nhạc đệm hợp âm</span>
@@ -530,7 +534,12 @@ const store = {
 
 /* ---------------- Âm thanh ---------------- */
 let ctx = null, master = null;
+/* iPhone: nói rõ đây là âm thanh phát ra loa (để nút gạt im lặng không làm mất tiếng) */
+function setAudioSession(){
+  try{ if (navigator.audioSession) navigator.audioSession.type = micOn ? 'play-and-record' : 'playback'; }catch(e){}
+}
 function ensureCtx(){
+  setAudioSession();
   if (!ctx){
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = 0.6; master.connect(ctx.destination);
@@ -561,6 +570,13 @@ function click(at, accent){ // tiếng gõ nhịp ngắn, không khoá micro
   g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(accent ? 0.12 : 0.06, at+0.002);
   g.gain.exponentialRampToValueAtTime(0.0005, at+0.03);
   o.connect(g); g.connect(master); o.start(at); o.stop(at+0.04);
+}
+/* Điện thoại chỉ cho phát tiếng sau lần chạm đầu tiên: chạm bất kỳ đâu là mở khóa âm thanh */
+document.addEventListener('pointerdown', () => ensureCtx(), {once:true, capture:true});
+function testSound(){
+  ensureCtx();
+  [60,64,67,72].forEach((m,i) => tone(m, 0.7, i*0.18));
+  $('sound-note').textContent = 'Nếu không nghe thấy: tăng âm lượng điện thoại (âm lượng nhạc/media). iPhone: gạt nút im lặng ở cạnh máy sang chế độ chuông.';
 }
 function accActive(){ return acc && (mode !== 'mic' || phones); }
 function playChord(name){
@@ -747,6 +763,7 @@ async function chooseMode(m){
   markMode();
 }
 document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => chooseMode(b.dataset.mode)));
+$('test-sound').addEventListener('click', testSound);
 function bindOpt(id, get, set){ const el = $(id); el.checked = get(); el.addEventListener('change', () => set(el.checked)); }
 bindOpt('lenient', () => lenient, v => { lenient = v; store.set('lenient', v); });
 bindOpt('opt-acc', () => acc, v => { acc = v; store.set('acc', v); updateAccBtn(); });
@@ -804,7 +821,7 @@ async function startMic(){
     src.connect(analyser);
     buf = new Float32Array(analyser.fftSize);
     yinBuf = new Float32Array(Math.ceil(ctx.sampleRate/70));
-    micOn = true;
+    micOn = true; setAudioSession();
     setStatus('Micro đang nghe. Đánh thử một phím trên đàn: thanh màu xanh sẽ nhảy và hiện tên nốt.', 'ok');
     setInterval(micLoop, 20);
     return true;
