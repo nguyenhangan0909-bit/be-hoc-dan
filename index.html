@@ -149,6 +149,36 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .gdots{display:flex;gap:6px;justify-content:center}
 .gdots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
 .gdots i.on{background:var(--ink)}
+.icon-btn svg{width:22px;height:22px;display:block}
+.rotate-hint{display:none}
+
+/* ---------- Điện thoại nằm ngang: hình gợi ý bên trái, dải nốt + nút bên phải, phím to ở dưới ---------- */
+@media (orientation:landscape) and (max-height:560px){
+  .topbar{padding-top:max(4px,env(safe-area-inset-top));padding-bottom:4px}
+  .topbar h2{font-size:1rem}
+  .icon-btn{height:36px;min-width:36px;border-radius:12px}
+  .progress{height:5px}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);
+    grid-template-areas:"now msg" "now lane" "stat ctrl";align-content:start;gap:4px 14px;padding-top:6px;padding-bottom:6px;overflow:hidden}
+  .now{grid-area:now;min-height:0;padding:6px 10px;gap:8px;border-radius:16px}
+  .staff,.hand{width:84px;height:72px}
+  .target .big{font-size:clamp(1.5rem,6vh,2.2rem)}
+  .target .finger{font-size:.85rem}
+  .msg{grid-area:msg;font-size:.95rem;min-height:1.3em;text-align:left;align-self:end}
+  .lane{grid-area:lane;padding:6px 8px}
+  .nb{width:34px;height:34px;font-size:.72rem}
+  .nb.big{font-size:1rem}
+  .controls{grid-area:ctrl;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto}
+  .pill{padding:7px 12px;font-size:.9rem;white-space:nowrap}
+  .mini-status{grid-area:stat;font-size:.78rem}
+  .kb-wrap{height:max(46vh,150px)}
+  .key.white .nm{font-size:clamp(.7rem,2.2vw,1.1rem)}
+  .key.white .fb{width:22px;height:22px;font-size:.78rem}
+  #rotate{display:none}
+}
+@media (orientation:portrait){
+  .rotate-hint{display:block;text-align:center;font-size:.85rem;color:var(--soft)}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -223,6 +253,9 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
     <button class="icon-btn" id="back" aria-label="Về danh sách bài">‹ Bài</button>
     <h2 id="song-title">—</h2>
     <span class="stars" id="count">0/0</span>
+    <button class="icon-btn" id="rotate" aria-label="Xoay ngang màn hình" title="Xoay ngang">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="11" rx="2"/><path d="M8 4h7l-2-2M15 4l-2 2"/></svg>
+    </button>
   </div>
   <div class="progress"><i id="prog"></i></div>
   <div class="stage">
@@ -242,6 +275,7 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
       <button class="pill" id="hear-phrase">Nghe cả câu</button>
       <button class="pill" id="restart">Chơi lại</button>
     </div>
+    <div class="rotate-hint" id="rotate-hint">Xoay ngang điện thoại để phím đàn to hơn.</div>
     <div class="mini-status" id="mini-status">
       <span id="mode-label"></span>
       <div class="meter" id="play-meter" aria-hidden="true"><i class="meter-fill"></i></div>
@@ -952,6 +986,16 @@ $('again').addEventListener('click', () => { $('done').hidden = true; startLesso
 $('next').addEventListener('click', () => { $('done').hidden = true; startLesson(lesson.cat, lesson.index+1); });
 $('to-list').addEventListener('click', () => { $('done').hidden = true; toList(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && playing) keepAwake(); });
+/* Xoay ngang: Android vào toàn màn hình rồi khóa hướng ngang; iPhone không cho trang tự xoay nên nhắc bé xoay tay */
+$('rotate').addEventListener('click', async () => {
+  try{
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen({navigationUI:'hide'});
+    await screen.orientation.lock('landscape');
+  }catch(e){
+    say('Hãy xoay điện thoại nằm ngang. Nếu màn hình không xoay, tắt "Khóa xoay màn hình" trong phần cài đặt nhanh.', '');
+  }
+});
+screen.orientation?.addEventListener?.('change', () => { if (playing && lesson && lesson.kind !== 'ear') setTimeout(updateTarget, 200); });
 
 /* ---------------- Khởi động ---------------- */
 if (!catOf(tab)) tab = 'finger';
