@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-/* Bố cục: một cột cho điện thoại; màn hình chơi = khuông nhạc + dải nốt ở trên, bàn phím to cố định ở dưới */
+/* Bố cục: một cột cho điện thoại; màn hình chơi = hình gợi ý + dải nốt ở trên, bàn phím to cố định ở dưới */
 :root{
   --paper:#FFF6E6; --card:#FFFFFF; --ink:#2A2341; --soft:#6E6684; --line:#EEDFC4;
-  --accent:#2F5BEA; --accent-ink:#FFFFFF; --good:#18A05A; --bad:#E5484D;
+  --accent:#2F5BEA; --accent-ink:#FFFFFF; --good:#18A05A; --bad:#E5484D; --skin:#FFD9B8;
   --c0:#E53935; --c2:#FB8C00; --c4:#F5C518; --c5:#3DA845; --c7:#1E88E5; --c9:#5E35B1; --c11:#D81B78;
   --display:"Baloo 2",ui-rounded,system-ui,sans-serif;
   --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -32,7 +32,6 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
   display:flex;flex-direction:column;gap:22px}
 .hero{display:flex;flex-direction:column;gap:6px;padding-top:8px}
 .hero h1{font-size:clamp(2.4rem,9vw,3.4rem);font-weight:800;letter-spacing:-.01em}
-.hero h1 span{display:inline-block}
 .hero p{margin:0;color:var(--soft);font-size:1.05rem;max-width:34ch}
 .rainbow{display:flex;gap:4px;margin-top:6px}
 .rainbow i{flex:1;height:8px;border-radius:4px}
@@ -55,6 +54,11 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .tip{background:var(--card);border-radius:18px;padding:16px;border:2px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
 .tip p{margin:4px 0 0;color:var(--soft);line-height:1.45}
 .mini-kb{width:96px;height:56px;align-self:start}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;border-radius:999px;padding:10px 16px;background:var(--card);font-weight:800;white-space:nowrap;box-shadow:0 1px 0 var(--line)}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+.panel-desc{color:var(--soft);margin:10px 0 12px;line-height:1.45}
 .lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
 .lesson{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px;min-width:0}
 .lesson:active{transform:scale(.98)}
@@ -63,6 +67,9 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .lesson .dots{display:flex;gap:3px;flex-wrap:wrap}
 .lesson .dots i{width:10px;height:10px;border-radius:50%}
 .lesson .meta{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--soft)}
+.lesson.guide{background:var(--ink);color:#fff;border-color:var(--ink)}
+.lesson.guide .sub{color:#CFC8E6}
+.lesson.guide svg{width:100%;max-width:170px;height:auto}
 .stars{color:#F2B705;letter-spacing:2px;font-size:1rem}
 .stars .off{color:var(--line)}
 .opt{display:flex;align-items:center;gap:10px;font-size:.95rem;color:var(--soft)}
@@ -76,8 +83,9 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .progress{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:0 max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left))}
 .progress i{display:block;height:100%;width:0;background:var(--good);transition:width .25s}
 .stage{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left))}
-.now{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:10px 14px;border:2px solid var(--line)}
-.staff{width:110px;height:96px}
+.now{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--card);border-radius:20px;padding:10px 14px;border:2px solid var(--line);min-height:116px}
+.now.noart{grid-template-columns:1fr}
+.staff,.hand{width:110px;height:96px}
 .target{display:flex;flex-direction:column;gap:2px;min-width:0}
 .target .lbl{font-size:.8rem;color:var(--soft);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
 .target .big{font-family:var(--display);font-size:clamp(2rem,10vw,3rem);font-weight:800;line-height:1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
@@ -88,23 +96,31 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .lane{position:relative;display:flex;gap:6px;overflow-x:auto;padding:8px 2px;scroll-behavior:smooth;scrollbar-width:none}
 .lane::-webkit-scrollbar{display:none}
 .nb{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;color:#fff;background:var(--c);opacity:.45;transition:transform .2s,opacity .2s}
+.nb.big{font-size:1.15rem;font-family:var(--display)}
 .nb.y{color:var(--ink)}
+.nb.hid{background:#B9B3C9;color:#fff}
 .nb.brk{margin-left:14px}
 .nb.cur{opacity:1;transform:scale(1.25);box-shadow:0 0 0 3px var(--paper),0 0 0 6px var(--c)}
+.nb.hid.cur{box-shadow:0 0 0 3px var(--paper),0 0 0 6px #B9B3C9}
 .nb.done{opacity:.9;transform:scale(.85)}
+.nb.ping{opacity:1;transform:scale(1.3)}
 .nb.shake{animation:shake .35s}
 @keyframes shake{25%{translate:-5px}75%{translate:5px}}
 .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .pill{border:0;border-radius:999px;padding:10px 16px;background:var(--card);font-weight:800;box-shadow:0 1px 0 var(--line)}
 .pill.primary{background:var(--accent);color:var(--accent-ink)}
+.pill:disabled{opacity:.45}
 .mini-status{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--soft);padding:0 2px}
 
 /* Bàn phím */
 .kb-wrap{flex:0 0 auto;height:clamp(150px,36vh,280px);padding:0 max(6px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));background:#2A2341}
 .kb{position:relative;height:100%;display:flex;gap:3px;padding-top:8px;touch-action:none;user-select:none;-webkit-user-select:none}
-.key.white{flex:1;background:#FFFDF8;border-radius:0 0 10px 10px;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:8px;gap:4px;transition:background .1s}
-.key.white .nm{font-family:var(--display);font-weight:800;font-size:clamp(.7rem,3.2vw,1.05rem);color:var(--ink)}
+.key.white{flex:1;min-width:0;background:#FFFDF8;border-radius:0 0 10px 10px;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:8px;gap:4px;transition:background .1s}
+.key.white .nm{font-family:var(--display);font-weight:800;font-size:clamp(.62rem,3vw,1.05rem);color:var(--ink)}
 .key.white .dot{width:60%;max-width:34px;height:8px;border-radius:4px;background:var(--c)}
+.key.white .fb{width:clamp(16px,5vw,24px);height:clamp(16px,5vw,24px);border-radius:50%;background:var(--ink);color:#fff;font-size:clamp(.6rem,2.6vw,.8rem);font-weight:800;display:grid;place-items:center}
+.key.white .fb:empty{display:none}
+.key.white .fb.lh{background:#8A5A2B}
 .key.black{position:absolute;top:8px;height:58%;background:#1A1528;border-radius:0 0 7px 7px;z-index:2;border:2px solid #2A2341;border-top:0}
 .key.target.white{background:color-mix(in srgb,var(--c) 30%,#FFFDF8);box-shadow:inset 0 -10px 0 var(--c)}
 .key.target.white .nm{transform:scale(1.15)}
@@ -116,12 +132,23 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
 .key.target.white::before{content:"";position:absolute;top:-2px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--c);animation:bob 1s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(6px)}}
 
-/* Hoàn thành */
-.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 55%,transparent);display:grid;place-items:center;padding:20px;z-index:20}
+/* Lớp phủ: hoàn thành + hướng dẫn */
+.overlay{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 55%,transparent);display:grid;place-items:center;padding:20px;z-index:20;overflow:auto}
 .done-card{background:var(--card);border-radius:26px;padding:26px 22px;max-width:360px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px}
 .done-card h2{font-size:2rem}
 .done-card .stars{font-size:2.6rem;letter-spacing:6px}
 .done-card .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.guide-card{background:var(--card);border-radius:26px;padding:20px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px}
+.guide-card .step-no{font-size:.8rem;font-weight:800;color:var(--soft);text-transform:uppercase;letter-spacing:.08em}
+.guide-card h2{font-size:1.6rem}
+.guide-card .illus{display:flex;justify-content:center;gap:10px;min-height:20px}
+.guide-card .illus svg{max-width:100%;height:auto}
+.guide-card ul{margin:0;padding-left:1.2em;line-height:1.5;color:var(--ink)}
+.guide-card li+li{margin-top:4px}
+.guide-card .row{display:flex;gap:8px;justify-content:space-between}
+.gdots{display:flex;gap:6px;justify-content:center}
+.gdots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.gdots i.on{background:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -165,6 +192,13 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
     </div>
   </section>
 
+  <section>
+    <h2 class="section-label">2. Chọn cách học</h2>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <p class="panel-desc" id="panel-desc"></p>
+    <div class="lessons" id="lessons"></div>
+  </section>
+
   <section class="tip">
     <svg class="mini-kb" viewBox="0 0 120 70" aria-hidden="true">
       <g stroke="#2A2341" stroke-width="2" fill="#FFFDF8">
@@ -180,11 +214,6 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
     </div>
   </section>
 
-  <section>
-    <h2 class="section-label">2. Chọn bài</h2>
-    <div class="lessons" id="lessons"></div>
-  </section>
-
   <label class="opt"><input type="checkbox" id="lenient" checked> Đánh đúng tên nốt ở quãng khác vẫn tính là đúng</label>
 </main>
 
@@ -197,10 +226,11 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
   </div>
   <div class="progress"><i id="prog"></i></div>
   <div class="stage">
-    <div class="now">
+    <div class="now" id="now">
       <svg class="staff" id="staff" viewBox="0 0 110 96" aria-hidden="true"></svg>
+      <svg class="hand" id="hand" viewBox="0 0 100 96" aria-hidden="true" hidden></svg>
       <div class="target">
-        <span class="lbl">Bé đánh nốt</span>
+        <span class="lbl" id="tlbl">Bé đánh nốt</span>
         <div class="big" id="tname"><span class="chip"></span><span>—</span></div>
         <span class="finger" id="tfinger"></span>
       </div>
@@ -234,14 +264,30 @@ h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
   </div>
 </div>
 
+<div class="overlay" id="guide" hidden>
+  <div class="guide-card" role="dialog" aria-labelledby="g-title">
+    <span class="step-no" id="g-no"></span>
+    <h2 id="g-title"></h2>
+    <div class="illus" id="g-illus"></div>
+    <ul id="g-text"></ul>
+    <div class="gdots" id="g-dots"></div>
+    <div class="row">
+      <button class="pill" id="g-prev">‹ Trước</button>
+      <button class="pill" id="g-close">Đóng</button>
+      <button class="pill primary" id="g-next">Tiếp ›</button>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 /* ---------------- Dữ liệu nốt ---------------- */
 const NAMES = ['Đô','Đô#','Rê','Rê#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
 const NATURAL = {0:1,2:1,4:1,5:1,7:1,9:1,11:1};
 const LETTER = {C:0,D:2,E:4,F:5,G:7,A:9,B:11};
-const STEP = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+const NOTE_HEX = {0:'#E53935',2:'#FB8C00',4:'#F5C518',5:'#3DA845',7:'#1E88E5',9:'#5E35B1',11:'#D81B78'};
 const colorOf = m => NATURAL[m%12] ? `var(--c${m%12})` : '#8A84A0';
+const hexOf = m => NOTE_HEX[m%12] || '#8A84A0';
 const isYellow = m => m%12 === 4;
 function noteName(m){
   const oct = Math.floor(m/12)-1;
@@ -256,9 +302,33 @@ function staffStep(m){ // bậc tính từ Đô giữa (C4 = 0)
   const s = pcToStep[pc] ?? pcToStep[pc-1];
   return s + 7*(oct-4);
 }
-const FINGER = {60:1,62:2,64:3,65:4,67:5};
+/* Vị trí Đô: tay phải ngón 1..5 = Đô giữa..Sol; tay trái ngón 5..1 = Đô thấp..Sol thấp */
+const RH = {1:60,2:62,3:64,4:65,5:67};
+const LH = {5:48,4:50,3:52,2:53,1:55};
+const HAND_NAME = {R:'tay phải', L:'tay trái'};
 
-const SONGS = [
+/* ---------------- Bài học ---------------- */
+function phrases(str, fn){ // "a b | c d" -> mỗi mục qua fn, kèm vị trí ngắt câu
+  const out = {items:[], breaks:new Set()};
+  str.split('|').forEach((ph,pi) => ph.trim().split(/\s+/).forEach((t,i) => {
+    if (i===0 && pi>0) out.breaks.add(out.items.length);
+    out.items.push(fn(t));
+  }));
+  return out;
+}
+const FINGER_LESSONS = [
+  {id:'f-r1', title:'Chào ngón tay phải', sub:'Ngón 1 đến 5 rồi đi xuống', level:1, spec:'R1 R2 R3 R4 R5 | R5 R4 R3 R2 R1'},
+  {id:'f-r2', title:'Ngón đôi bạn', sub:'Hai ngón cạnh nhau thay phiên', level:1, spec:'R1 R2 R1 R2 | R2 R3 R2 R3 | R3 R4 R3 R4 | R4 R5 R4 R5'},
+  {id:'f-l1', title:'Chào ngón tay trái', sub:'Ngón 5 bắt đầu ở Đô thấp', level:1, spec:'L5 L4 L3 L2 L1 | L1 L2 L3 L4 L5'},
+  {id:'f-r3', title:'Ngón tay nhảy', sub:'Nhảy cách một phím: 1, 3, 5', level:2, spec:'R1 R3 R5 R3 R1 | R1 R3 R5 R3 R1 | R2 R4 R2 R4 | R1'},
+  {id:'f-l2', title:'Tay trái nhảy', sub:'5, 3, 1 rồi quay lại', level:2, spec:'L5 L3 L1 L3 L5 | L5 L4 L5 L4 | L2 L1 L2 L1 | L5'},
+  {id:'f-r4', title:'Ngón 4 và 5 khỏe lên', sub:'Tập hai ngón yếu nhất', level:3, spec:'R3 R4 R5 R4 R3 | R4 R5 R4 R5 R4 | R5 R4 R3 R2 R1'},
+  {id:'f-b1', title:'Hai tay thay nhau', sub:'Tay trái đi lên, tay phải đi tiếp', level:3, spec:'L5 L4 L3 L2 L1 | R1 R2 R3 R4 R5 | R5 R4 R3 R2 R1 | L1 L2 L3 L4 L5'},
+].map(l => {
+  const p = phrases(l.spec, t => ({hand:t[0], f:+t[1], m:(t[0]==='R'?RH:LH)[+t[1]]}));
+  return {...l, kind:'finger', steps:p.items, seq:p.items.map(s=>s.m), breaks:p.breaks};
+});
+const SONG_LESSONS = [
   {id:'warm', title:'Làm quen Đô Rê Mi', sub:'Đi lên rồi đi xuống', level:1, cpos:true,
    notes:'C4 D4 E4 | E4 D4 C4 | C4 D4 E4 F4 G4 | G4 F4 E4 D4 C4'},
   {id:'five', title:'Năm ngón tay', sub:'Nhảy cách một phím', level:1, cpos:true,
@@ -275,13 +345,31 @@ const SONGS = [
    notes:'E4 E4 E4 | E4 E4 E4 | E4 G4 C4 D4 E4 | F4 F4 F4 F4 F4 E4 E4 E4 E4 D4 D4 E4 D4 G4 | E4 E4 E4 | E4 E4 E4 | E4 G4 C4 D4 E4 | F4 F4 F4 F4 F4 E4 E4 E4 G4 G4 F4 D4 C4'},
   {id:'bday', title:'Chúc mừng sinh nhật', sub:'Happy Birthday', level:3, cpos:false,
    notes:'G3 G3 A3 G3 C4 B3 | G3 G3 A3 G3 D4 C4 | G3 G3 G4 E4 C4 B3 A3 | F4 F4 E4 C4 D4 C4'},
+].map(l => { const p = phrases(l.notes, parseNote); return {...l, kind:'song', seq:p.items, breaks:p.breaks}; });
+const FIVE = 'C4 D4 E4 F4 G4', EIGHT = 'C4 D4 E4 F4 G4 A4 B4 C5';
+const READ_LESSONS = [
+  {id:'r-n5', show:'name',  pool:FIVE,  title:'Tìm phím theo tên', sub:'Đô đến Sol, không có phím sáng', level:1},
+  {id:'r-s5', show:'staff', pool:FIVE,  title:'Đọc nốt trên khuông', sub:'Nhìn nốt nhạc rồi đánh, Đô đến Sol', level:2},
+  {id:'r-n8', show:'name',  pool:EIGHT, title:'Tìm phím theo tên (khó)', sub:'Đô đến Đô cao', level:2},
+  {id:'r-s8', show:'staff', pool:EIGHT, title:'Đọc nốt trên khuông (khó)', sub:'Đô đến Đô cao', level:3},
+].map(l => ({...l, kind:'read', poolM:l.pool.split(' ').map(parseNote), count:10}));
+const EAR_LESSONS = [
+  {id:'e-3',  pool:'C4 D4 E4', showKeys:true,  title:'Nghe Đô Rê Mi', sub:'Phím sáng lên khi đàn mẫu', level:1},
+  {id:'e-5',  pool:FIVE,       showKeys:true,  title:'Nghe 5 nốt', sub:'Đô đến Sol, có phím sáng', level:2},
+  {id:'e-5h', pool:FIVE,       showKeys:false, title:'Chỉ nghe bằng tai', sub:'Không có phím sáng, khó nhất', level:3},
+].map(l => ({...l, kind:'ear', poolM:l.pool.split(' ').map(parseNote), rounds:5}));
+
+const CATS = [
+  {key:'finger', label:'5 ngón tay', items:FINGER_LESSONS,
+   desc:'Học đặt tay đúng và dùng đủ 5 ngón. Mỗi phím ghi số ngón cần dùng. Xem "Cách đặt tay" trước khi tập.'},
+  {key:'song', label:'Bài hát', items:SONG_LESSONS,
+   desc:'Đánh theo từng nốt của bài hát. Phím cần đánh sáng lên, bé đánh đúng thì sang nốt tiếp.'},
+  {key:'read', label:'Đọc nốt', items:READ_LESSONS,
+   desc:'Không có phím sáng. Bé tự tìm phím theo tên nốt, hoặc nhìn nốt trên khuông nhạc để đánh.'},
+  {key:'ear', label:'Nghe & đánh lại', items:EAR_LESSONS,
+   desc:'Điện thoại đàn mẫu vài nốt, bé nghe rồi đánh lại đúng thứ tự. Mỗi vòng dài thêm một nốt.'},
 ];
-for (const s of SONGS){
-  s.seq = []; s.breaks = new Set();
-  s.notes.split('|').forEach((ph,pi) => {
-    ph.trim().split(/\s+/).forEach((t,i) => { if (i===0 && pi>0) s.breaks.add(s.seq.length); s.seq.push(parseNote(t)); });
-  });
-}
+const catOf = k => CATS.find(c => c.key === k);
 
 /* ---------------- Lưu trữ nhỏ trên máy ---------------- */
 const store = {
@@ -317,26 +405,135 @@ function tone(m, dur=0.9, when=0){
 /* ---------------- Trạng thái ---------------- */
 let mode = store.get('mode', null);
 let lenient = store.get('lenient', true);
-let song = null, idx = 0, mistakes = 0, wrongHere = 0, playing = false;
+let tab = store.get('tab', 'finger');
+let lesson = null, seq = [], breaks = new Set(), idx = 0, mistakes = 0, wrongHere = 0, playing = false, busy = false;
+let ear = null;
 const $ = id => document.getElementById(id);
 
+/* ---------------- Hình bàn tay & bàn phím minh hoạ (SVG) ---------------- */
+const FG = [ {f:2,x:26,y:20,w:14,h:42}, {f:3,x:43,y:12,w:14,h:50}, {f:4,x:60,y:18,w:14,h:44}, {f:5,x:77,y:32,w:13,h:32} ];
+const THUMB = {f:1,x:16,y:46,w:15,h:30};
+function handSVG(hand, active, color, label=true){
+  const W = 100, mir = g => hand==='R' ? g : {...g, x: W - g.x - g.w};
+  let s = '';
+  const finger = g => {
+    const on = g.f === active;
+    s += `<rect x="${g.x}" y="${g.y}" width="${g.w}" height="${g.h}" rx="7" fill="${on?color:'var(--skin)'}" stroke="#2A2341" stroke-width="1.6"/>`;
+    s += `<text x="${g.x+g.w/2}" y="${g.y+12}" font-size="10" font-weight="800" text-anchor="middle" fill="${on && color !== NOTE_HEX[4] ? '#fff' : '#2A2341'}" font-family="Nunito,sans-serif">${g.f}</text>`;
+  };
+  FG.map(mir).forEach(finger);
+  const th = mir(THUMB);
+  const palmX = hand==='R' ? 22 : W-22-70;
+  s += `<rect x="${palmX}" y="50" width="70" height="40" rx="16" fill="var(--skin)" stroke="#2A2341" stroke-width="1.6"/>`;
+  s += `<rect x="${palmX+2}" y="46" width="66" height="12" fill="var(--skin)"/>`;
+  s += `<g transform="rotate(${hand==='R'?-28:28} ${th.x+th.w/2} ${th.y+th.h})">`; finger(th); s += `</g>`;
+  if (label) s += `<text x="${palmX+35}" y="76" font-size="9" font-weight="800" text-anchor="middle" fill="#6E6684" font-family="Nunito,sans-serif">${hand==='R'?'TAY PHẢI':'TAY TRÁI'}</text>`;
+  return s;
+}
+function posKbSVG(which){ // bàn phím Đô thấp..Sol (12 phím trắng) có số ngón
+  const lo = 48, whites = []; for (let m=lo; whites.length<12; m++) if (NATURAL[m%12]) whites.push(m);
+  const kw = 20; let s = '';
+  whites.forEach((m,i) => {
+    s += `<rect x="${i*kw+1}" y="1" width="${kw-1}" height="78" rx="3" fill="#FFFDF8" stroke="#2A2341" stroke-width="1.4"/>`;
+    s += `<text x="${i*kw+kw/2+0.5}" y="73" font-size="7" font-weight="800" text-anchor="middle" fill="#2A2341" font-family="Nunito,sans-serif">${NAMES[m%12]}</text>`;
+  });
+  whites.forEach((m,i) => { if (i<11 && !NATURAL[(m+1)%12]) s += `<rect x="${(i+1)*kw-5.5}" y="1" width="12" height="46" rx="2" fill="#1A1528"/>`; });
+  const map = which==='R' ? RH : LH;
+  Object.entries(map).forEach(([f,m]) => {
+    const i = whites.indexOf(m), cx = i*kw+kw/2+0.5;
+    s += `<circle cx="${cx}" cy="58" r="7.5" fill="${hexOf(m)}" stroke="#2A2341" stroke-width="1.2"/>`;
+    s += `<text x="${cx}" y="61.5" font-size="9.5" font-weight="800" text-anchor="middle" fill="${m%12===4?'#2A2341':'#fff'}" font-family="Nunito,sans-serif">${f}</text>`;
+  });
+  const mid = whites.indexOf(60);
+  s += `<text x="${mid*kw+kw/2}" y="92" font-size="8" font-weight="800" text-anchor="middle" fill="#E53935" font-family="Nunito,sans-serif">Đô giữa</text>`;
+  if (which==='L') s += `<text x="${kw/2}" y="92" font-size="8" font-weight="800" text-anchor="middle" fill="#E53935" font-family="Nunito,sans-serif">Đô thấp</text>`;
+  return `<svg viewBox="0 0 241 96" width="300">${s}</svg>`;
+}
+
+/* ---------------- Hướng dẫn 5 ngón ---------------- */
+const GUIDE = [
+  {title:'Ngồi đúng tư thế', illus:() => `<svg viewBox="0 0 100 96" width="120">${handSVG('R',0,'',true)}</svg>`, text:[
+    'Ngồi ở giữa đàn, lưng thẳng, ngồi ở nửa trước của ghế.',
+    'Ghế cao vừa để khuỷu tay ngang với mặt phím. Bé nhỏ thì kê thêm đệm.',
+    'Chân đặt chắc trên sàn hoặc trên một chiếc ghế nhỏ.',
+    'Vai thả lỏng, không nhún vai.']},
+  {title:'Đánh số ngón tay', illus:() => `<svg viewBox="0 0 100 96" width="130">${handSVG('L',0,'',true)}</svg><svg viewBox="0 0 100 96" width="130">${handSVG('R',0,'',true)}</svg>`, text:[
+    'Ngón cái là số 1, ngón trỏ số 2, ngón giữa số 3, ngón áp út số 4, ngón út số 5.',
+    'Hai tay đều đếm từ ngón cái, nên ngón cái tay nào cũng là số 1.',
+    'Trò chơi: bố mẹ gọi "tay phải số 3", bé nhúc nhích đúng ngón đó.']},
+  {title:'Bàn tay khum tròn', illus:() => `<svg viewBox="0 0 100 96" width="130">${handSVG('R',3,'#3DA845',true)}</svg>`, text:[
+    'Khum tay như đang cầm một quả bóng nhỏ hoặc một quả trứng.',
+    'Đánh bằng đầu ngón tay, ngón không nằm bẹp trên phím.',
+    'Cổ tay thả lỏng và ngang với phím, không gập xuống.',
+    'Ngón cái chạm phím bằng cạnh bên của đầu ngón.']},
+  {title:'Vị trí Đô cho tay phải', illus:() => posKbSVG('R'), text:[
+    'Ngón 1 đặt lên Đô giữa.',
+    'Ngón 2 lên Rê, 3 lên Mi, 4 lên Fa, 5 lên Sol.',
+    'Mỗi ngón ở sẵn trên một phím trắng, không cần nhấc tay khi đánh 5 nốt này.']},
+  {title:'Vị trí Đô cho tay trái', illus:() => posKbSVG('L'), text:[
+    'Ngón 5 (ngón út) đặt lên Đô thấp: phím Đô ngay bên trái Đô giữa.',
+    'Ngón 4 lên Rê, 3 lên Mi, 2 lên Fa, ngón 1 (ngón cái) lên Sol thấp.',
+    'Ngón cái tay trái và ngón cái tay phải đứng gần nhau ở giữa đàn.']},
+  {title:'Mẹo tập mỗi ngày', illus:() => '', text:[
+    'Đánh chậm và đều. Đúng quan trọng hơn nhanh.',
+    'Nhấc ngón lên rõ ràng rồi mới đánh nốt sau.',
+    'Ngón 4 và 5 yếu nhất, cần tập nhiều hơn các ngón khác.',
+    'Mỗi ngày 10 phút tốt hơn một buổi dài mỗi tuần.']},
+];
+let gi = 0;
+function openGuide(i=0){ gi = i; renderGuide(); $('guide').hidden = false; }
+function renderGuide(){
+  const g = GUIDE[gi];
+  $('g-no').textContent = `Bước ${gi+1} / ${GUIDE.length}`;
+  $('g-title').textContent = g.title;
+  $('g-illus').innerHTML = g.illus();
+  const ul = $('g-text'); ul.innerHTML = '';
+  g.text.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+  $('g-dots').innerHTML = GUIDE.map((_,i) => `<i class="${i===gi?'on':''}"></i>`).join('');
+  $('g-prev').disabled = gi === 0;
+  $('g-next').textContent = gi === GUIDE.length-1 ? 'Tập ngay' : 'Tiếp ›';
+}
+$('g-prev').addEventListener('click', () => { if (gi>0){ gi--; renderGuide(); } });
+$('g-next').addEventListener('click', () => {
+  if (gi < GUIDE.length-1){ gi++; renderGuide(); }
+  else { $('guide').hidden = true; startLesson('finger', 0); }
+});
+$('g-close').addEventListener('click', () => { $('guide').hidden = true; });
+
 /* ---------------- Trang chủ ---------------- */
+function renderTabs(){
+  const box = $('tabs'); box.innerHTML = '';
+  CATS.forEach(c => {
+    const b = document.createElement('button'); b.className = 'tab'; b.role = 'tab';
+    b.textContent = c.label; b.setAttribute('aria-selected', String(c.key===tab));
+    b.addEventListener('click', () => { tab = c.key; store.set('tab', tab); renderTabs(); renderLessons(); });
+    box.appendChild(b);
+  });
+}
 function renderLessons(){
-  const box = $('lessons'); box.innerHTML = '';
-  SONGS.forEach((s,i) => {
+  const cat = catOf(tab), box = $('lessons'); box.innerHTML = '';
+  $('panel-desc').textContent = cat.desc;
+  if (tab === 'finger'){
+    const g = document.createElement('button'); g.className = 'lesson guide';
+    g.innerHTML = `<h3>Cách đặt tay</h3><div class="sub">6 bước: tư thế, số ngón, khum tay, vị trí Đô hai tay</div><svg viewBox="0 0 200 96"><g>${handSVG('L',0,'',false)}</g><g transform="translate(100 0)">${handSVG('R',0,'',false)}</g></svg>`;
+    g.addEventListener('click', () => openGuide(0));
+    box.appendChild(g);
+  }
+  cat.items.forEach((s,i) => {
     const best = store.get('best:'+s.id, 0);
     const b = document.createElement('button'); b.className='lesson';
     const h = document.createElement('h3'); h.textContent = s.title;
     const sub = document.createElement('div'); sub.className='sub'; sub.textContent = s.sub;
     const dots = document.createElement('div'); dots.className='dots';
-    s.seq.slice(0,14).forEach(m => { const d=document.createElement('i'); d.style.background=colorOf(m); dots.appendChild(d); });
+    (s.seq || s.poolM).slice(0,14).forEach(m => { const d=document.createElement('i'); d.style.background=colorOf(m); dots.appendChild(d); });
     const meta = document.createElement('div'); meta.className='meta';
-    const lv = document.createElement('span'); lv.textContent = `${s.seq.length} nốt · ${['','Dễ','Vừa','Khó hơn'][s.level]}`;
+    const size = s.kind==='read' ? `${s.count} câu` : s.kind==='ear' ? `${s.rounds} vòng` : `${s.seq.length} nốt`;
+    const lv = document.createElement('span'); lv.textContent = `${size} · ${['','Dễ','Vừa','Khó hơn'][s.level]}`;
     const st = document.createElement('span'); st.className='stars';
     for (let k=1;k<=3;k++){ const x=document.createElement('span'); x.textContent='★'; if(k>best) x.className='off'; st.appendChild(x); }
     meta.append(lv, st);
     b.append(h, sub, dots, meta);
-    b.addEventListener('click', () => startSong(i));
+    b.addEventListener('click', () => startLesson(tab, i));
     box.appendChild(b);
   });
 }
@@ -468,40 +665,50 @@ $('sens').value = store.get('sens', 3);
 $('sens').addEventListener('change', e => store.set('sens', +e.target.value));
 
 /* ---------------- Bàn phím ---------------- */
-const KB_LOW = 55, KB_HIGH = 72; // Sol thấp .. Đô cao
-const keyEls = {};
-function buildKeyboard(){
-  const kb = $('kb'); kb.innerHTML = '';
-  const whites = []; for (let m=KB_LOW; m<=KB_HIGH; m++) if (NATURAL[m%12]) whites.push(m);
+let keyEls = {};
+function keyRange(notes){
+  let lo = Math.min(...notes), hi = Math.max(...notes), up = true;
+  const whites = () => { let n=0; for (let m=lo; m<=hi; m++) if (NATURAL[m%12]) n++; return n; };
+  while (whites() < 10){
+    if (up){ do hi++; while (!NATURAL[hi%12]); } else { do lo--; while (!NATURAL[lo%12]); }
+    up = !up;
+  }
+  return [lo, hi];
+}
+function buildKeyboard(lo, hi, badges={}){
+  const kb = $('kb'); kb.innerHTML = ''; keyEls = {};
+  const whites = []; for (let m=lo; m<=hi; m++) if (NATURAL[m%12]) whites.push(m);
   const n = whites.length;
   whites.forEach((m,i) => {
     const k = document.createElement('div'); k.className='key white'; k.dataset.m = m;
     k.style.setProperty('--c', colorOf(m));
+    const fb = document.createElement('span'); fb.className = 'fb' + (badges[m]?.hand==='L' ? ' lh' : '');
+    fb.textContent = badges[m] ? badges[m].f : '';
     const nm = document.createElement('span'); nm.className='nm'; nm.textContent = NAMES[m%12];
     const dot = document.createElement('span'); dot.className='dot';
-    k.append(nm, dot); kb.appendChild(k); keyEls[m] = k;
+    k.append(fb, nm, dot); kb.appendChild(k); keyEls[m] = k;
     const bm = m+1;
-    if (i < n-1 && !NATURAL[bm%12] && bm <= KB_HIGH){
+    if (i < n-1 && !NATURAL[bm%12]){
       const b = document.createElement('div'); b.className='key black'; b.dataset.m = bm;
       const w = 100/n;
       b.style.left = `calc(${(i+1)*w}% - ${w*0.3}%)`; b.style.width = `${w*0.6}%`;
       kb.appendChild(b); keyEls[bm] = b;
     }
   });
-  kb.addEventListener('pointerdown', e => {
-    const k = e.target.closest('.key'); if (!k) return;
-    e.preventDefault();
-    handleInput(+k.dataset.m, 'tap');
-  });
 }
+$('kb').addEventListener('pointerdown', e => {
+  const k = e.target.closest('.key'); if (!k) return;
+  e.preventDefault();
+  handleInput(+k.dataset.m, 'tap');
+});
 function flashKey(m, cls, ms=220){
   const k = keyEls[m]; if (!k) return;
   k.classList.add(cls); setTimeout(() => k.classList.remove(cls), ms);
 }
 
 /* ---------------- Khuông nhạc ---------------- */
-function drawStaff(m){
-  const svg = $('staff'), top = 22, gap = 10; // 5 dòng kẻ: y = 22..62
+function drawStaff(m, colored=true){
+  const svg = $('staff'), top = 22, gap = 10;
   const bottomY = top + 4*gap; // dòng Mi (E4)
   let out = '';
   for (let i=0;i<5;i++) out += `<line x1="4" x2="106" y1="${top+i*gap}" y2="${top+i*gap}" stroke="#2A2341" stroke-width="1.5"/>`;
@@ -512,38 +719,85 @@ function drawStaff(m){
     for (let l = 12; l <= st; l += 2) out += `<line x1="${cx-14}" x2="${cx+14}" y1="${bottomY-(l-2)*gap/2}" y2="${bottomY-(l-2)*gap/2}" stroke="#2A2341" stroke-width="1.5"/>`;
     const stemUp = st < 6;
     out += `<line x1="${stemUp?cx+6.5:cx-6.5}" x2="${stemUp?cx+6.5:cx-6.5}" y1="${y}" y2="${stemUp?y-30:y+30}" stroke="#2A2341" stroke-width="1.8"/>`;
-    out += `<ellipse cx="${cx}" cy="${y}" rx="7.5" ry="5.4" transform="rotate(-20 ${cx} ${y})" fill="${getComputedStyle(document.documentElement).getPropertyValue('--c'+(m%12)).trim() || '#2A2341'}" stroke="#2A2341" stroke-width="1.5"/>`;
+    out += `<ellipse cx="${cx}" cy="${y}" rx="7.5" ry="5.4" transform="rotate(-20 ${cx} ${y})" fill="${colored ? hexOf(m) : '#2A2341'}" stroke="#2A2341" stroke-width="1.5"/>`;
   }
   svg.innerHTML = out;
 }
+function setArt(kind){ // 'staff' | 'hand' | 'none'
+  $('staff').toggleAttribute('hidden', kind !== 'staff'); $('hand').toggleAttribute('hidden', kind !== 'hand');
+  $('now').classList.toggle('noart', kind === 'none');
+}
+function setBig(text, m){
+  const big = $('tname'); big.innerHTML = '';
+  if (m != null){ const chip = document.createElement('span'); chip.className='chip'; chip.style.background = colorOf(m); big.appendChild(chip); }
+  const tx = document.createElement('span'); tx.textContent = text; big.appendChild(tx);
+}
 
-/* ---------------- Chơi bài ---------------- */
+/* ---------------- Bắt đầu một bài ---------------- */
 let wakeLock = null;
 async function keepAwake(){ try{ wakeLock = await navigator.wakeLock?.request('screen'); }catch(e){} }
 function show(view){
   $('home').hidden = view!=='home'; $('play').hidden = view!=='play';
   document.body.style.overflow = view==='play' ? 'hidden' : '';
 }
-async function startSong(i){
-  ensureCtx();
+function randomSeq(pool, n){
+  const out = [];
+  while (out.length < n){
+    const m = pool[Math.floor(Math.random()*pool.length)];
+    if (m !== out[out.length-1]) out.push(m);
+  }
+  return out;
+}
+async function startLesson(catKey, i){
+  ensureCtx(); stopDemo();
   if (!mode){ mode = 'tap'; store.set('mode','tap'); }
   if (mode==='mic' && !micOn) await startMic();
   if (mode==='midi' && !midiAccess) await startMidi();
   markMode();
-  song = SONGS[i]; song.index = i;
-  idx = 0; mistakes = 0; wrongHere = 0; playing = true;
-  $('song-title').textContent = song.title;
-  buildLane(); show('play'); updateTarget(); keepAwake();
-  say(mode==='mic' ? 'Đặt điện thoại gần đàn rồi đánh nốt đầu tiên nhé!' : 'Đánh nốt đầu tiên nhé!', '');
+  lesson = catOf(catKey).items[i]; lesson.cat = catKey; lesson.index = i;
+  idx = 0; mistakes = 0; wrongHere = 0; playing = true; busy = false; ear = null;
+  breaks = lesson.breaks || new Set();
+  let badges = {};
+  if (lesson.kind === 'finger'){
+    seq = lesson.seq;
+    lesson.steps.forEach(s => { badges[s.m] = {f:s.f, hand:s.hand}; });
+    Object.entries(lesson.steps.some(s=>s.hand==='R') ? RH : {}).forEach(([f,m]) => badges[m] = {f:+f, hand:'R'});
+    Object.entries(lesson.steps.some(s=>s.hand==='L') ? LH : {}).forEach(([f,m]) => badges[m] = {f:+f, hand:'L'});
+  } else if (lesson.kind === 'song'){
+    seq = lesson.seq;
+    if (lesson.cpos) Object.entries(RH).forEach(([f,m]) => badges[m] = {f:+f, hand:'R'});
+  } else if (lesson.kind === 'read'){
+    seq = randomSeq(lesson.poolM, lesson.count);
+  } else if (lesson.kind === 'ear'){
+    ear = {round:0, full: randomSeq(lesson.poolM, lesson.rounds + 1)};
+    seq = ear.full.slice(0, 2);
+  }
+  const [lo, hi] = keyRange(lesson.kind==='read' || lesson.kind==='ear' ? lesson.poolM : seq);
+  buildKeyboard(lo, hi, badges);
+  $('song-title').textContent = lesson.title;
+  $('hear-phrase').hidden = lesson.kind !== 'song' && lesson.kind !== 'finger';
+  $('hear-note').textContent = lesson.kind === 'ear' ? 'Nghe lại' : 'Nghe nốt này';
+  show('play'); keepAwake();
+  if (lesson.kind === 'ear'){ earStartRound(); return; }
+  buildLane(); updateTarget();
+  say(mode==='mic' ? 'Đặt điện thoại gần đàn rồi bắt đầu nhé!' : 'Bắt đầu nhé!', '');
 }
 function buildLane(){
   const lane = $('lane'); lane.innerHTML = '';
-  song.seq.forEach((m,i) => {
+  seq.forEach((m,i) => {
     const b = document.createElement('span');
-    b.className = 'nb' + (isYellow(m)?' y':'') + (song.breaks.has(i)?' brk':'');
-    b.style.setProperty('--c', colorOf(m)); b.textContent = NAMES[m%12];
+    b.className = 'nb' + (breaks.has(i)?' brk':'');
+    b.style.setProperty('--c', colorOf(m));
+    if (lesson.kind === 'read' || lesson.kind === 'ear'){ b.classList.add('hid','big'); b.textContent = '?'; }
+    else if (lesson.kind === 'finger'){ b.classList.add('big'); if (isYellow(m)) b.classList.add('y'); b.textContent = lesson.steps[i].f; }
+    else { if (isYellow(m)) b.classList.add('y'); b.textContent = NAMES[m%12]; }
     lane.appendChild(b);
   });
+}
+function reveal(i){
+  const b = $('lane').children[i]; if (!b) return;
+  const m = seq[i];
+  b.classList.remove('hid','big'); if (isYellow(m)) b.classList.add('y'); b.textContent = NAMES[m%12];
 }
 function updateTarget(){
   const lane = $('lane'), bubbles = lane.children;
@@ -553,74 +807,155 @@ function updateTarget(){
   const cur = bubbles[idx];
   if (cur) lane.scrollTo({left: cur.offsetLeft - lane.clientWidth/2 + cur.offsetWidth/2, behavior:'smooth'});
   Object.values(keyEls).forEach(k => k.classList.remove('target'));
-  const m = song.seq[idx];
-  $('count').textContent = `${idx}/${song.seq.length}`;
-  $('prog').style.width = (idx/song.seq.length*100)+'%';
-  if (m == null){ drawStaff(null); return; }
-  keyEls[m]?.classList.add('target');
-  const big = $('tname'); big.innerHTML = '';
-  const chip = document.createElement('span'); chip.className='chip'; chip.style.background = colorOf(m);
-  const tx = document.createElement('span'); tx.textContent = noteName(m);
-  big.append(chip, tx);
-  $('tfinger').textContent = (song.cpos && FINGER[m]) ? `Tay phải, ngón số ${FINGER[m]}` : (m < 60 ? 'Phím nằm bên trái nốt Đô giữa' : (m > 67 ? 'Phím nằm bên phải nốt Sol' : ''));
-  drawStaff(m);
+  $('count').textContent = `${idx}/${seq.length}`;
+  $('prog').style.width = (idx/seq.length*100)+'%';
+  const m = seq[idx];
+  if (m == null) return;
+  const k = lesson.kind;
+  if (k !== 'read') keyEls[m]?.classList.add('target');
+  if (k === 'song'){
+    setArt('staff'); drawStaff(m); $('tlbl').textContent = 'Bé đánh nốt'; setBig(noteName(m), m);
+    $('tfinger').textContent = (lesson.cpos && Object.values(RH).includes(m)) ? `Tay phải, ngón số ${Object.keys(RH).find(f=>RH[f]===m)}`
+      : (m < 60 ? 'Phím nằm bên trái nốt Đô giữa' : (m > 67 ? 'Phím nằm bên phải nốt Sol' : ''));
+  } else if (k === 'finger'){
+    const st = lesson.steps[idx];
+    setArt('hand'); $('hand').innerHTML = handSVG(st.hand, st.f, hexOf(m), true);
+    $('tlbl').textContent = HAND_NAME[st.hand]; setBig(`Ngón ${st.f}`, m);
+    $('tfinger').textContent = `Đánh nốt ${noteName(m)}`;
+  } else if (k === 'read'){
+    $('tlbl').textContent = `Câu ${idx+1} / ${seq.length}`;
+    if (lesson.show === 'name'){
+      setArt('none'); setBig(noteName(m), m); $('tfinger').textContent = 'Bé tự tìm phím này trên đàn';
+    } else {
+      setArt('staff'); drawStaff(m, false); setBig('?'); $('tfinger').textContent = 'Nhìn nốt trên khuông rồi đánh';
+    }
+  }
 }
 const PRAISE = ['Đúng rồi!','Giỏi quá!','Hay lắm!','Tuyệt vời!','Chính xác!'];
+const praise = () => PRAISE[Math.floor(Math.random()*PRAISE.length)];
 function say(t, cls){ const el = $('msg'); el.textContent = t; el.className = 'msg' + (cls?' '+cls:''); }
+function shakeCur(){ const cur = $('lane').children[idx]; if (!cur) return; cur.classList.remove('shake'); void cur.offsetWidth; cur.classList.add('shake'); }
+
+/* ---------------- Xử lý phím bé đánh ---------------- */
+function matches(m, target){ return lenient ? (m%12 === target%12) : (m === target); }
 function handleInput(m, src){
   flashKey(m, 'down', 160);
   if (src !== 'mic') document.querySelectorAll('.heard-note').forEach(el => el.textContent = noteName(m));
   if (src === 'tap') tone(m);
-  if (!playing || !song) return;
-  const target = song.seq[idx];
-  const ok = lenient ? (m%12 === target%12) : (m === target);
-  if (ok){
+  if (!playing || !lesson || busy) return;
+  if (lesson.kind === 'ear') return earInput(m);
+  const target = seq[idx];
+  if (matches(m, target)){
     flashKey(target, 'good', 300);
+    if (lesson.kind === 'read'){ reveal(idx); say(`${praise()} Đó là ${noteName(target)}.`, 'good'); }
+    else say(praise(), 'good');
     idx++; wrongHere = 0;
-    say(PRAISE[Math.floor(Math.random()*PRAISE.length)], 'good');
-    if (idx >= song.seq.length) finish(); else updateTarget();
-  } else {
-    mistakes++; wrongHere++;
-    flashKey(m, 'wrong', 400);
-    const cur = $('lane').children[idx]; cur.classList.remove('shake'); void cur.offsetWidth; cur.classList.add('shake');
-    say(`Bé vừa đánh ${noteName(m)}. Tìm phím ${noteName(target)} nhé!`, 'bad');
-    if (wrongHere === 2) setTimeout(() => tone(target, 1.0), 450);
+    if (idx >= seq.length) finish(); else updateTarget();
+    return;
   }
+  mistakes++; wrongHere++;
+  flashKey(m, 'wrong', 400); shakeCur();
+  if (lesson.kind === 'finger'){
+    const st = lesson.steps[idx];
+    say(`Bé vừa đánh ${noteName(m)}. Dùng ngón ${st.f} ${HAND_NAME[st.hand]} đánh ${noteName(target)} nhé!`, 'bad');
+  } else if (lesson.kind === 'read'){
+    if (lesson.show === 'staff' && wrongHere >= 2){ setBig(noteName(target), target); say(`Gợi ý: đây là nốt ${noteName(target)}.`, 'bad'); }
+    else say(`Chưa đúng, bé vừa đánh ${noteName(m)}. Thử lại nhé!`, 'bad');
+    if (wrongHere >= 3) keyEls[target]?.classList.add('target');
+  } else {
+    say(`Bé vừa đánh ${noteName(m)}. Tìm phím ${noteName(target)} nhé!`, 'bad');
+  }
+  if (wrongHere === 2) setTimeout(() => tone(target, 1.0), 450);
 }
+
+/* ---------------- Nghe & đánh lại ---------------- */
 let demoTimers = [];
 function stopDemo(){ demoTimers.forEach(clearTimeout); demoTimers = []; }
+function earStartRound(){
+  seq = ear.full.slice(0, ear.round + 2); idx = 0;
+  buildLane(); earView('listen'); earDemo();
+}
+function earView(phase){
+  setArt('none');
+  $('tlbl').textContent = `Vòng ${ear.round+1} / ${lesson.rounds}`;
+  setBig(phase === 'listen' ? 'Nghe nhé...' : 'Đến lượt bé!');
+  $('tfinger').textContent = phase === 'listen' ? `Điện thoại đàn ${seq.length} nốt` : `Đánh lại ${seq.length} nốt theo đúng thứ tự`;
+  $('count').textContent = `${ear.round}/${lesson.rounds}`;
+  $('prog').style.width = (ear.round/lesson.rounds*100)+'%';
+  $('hear-note').disabled = phase === 'listen';
+}
+function earDemo(){
+  stopDemo(); busy = true; earView('listen'); say('', '');
+  const step = 0.7, start = 0.4, bubbles = $('lane').children;
+  for (let i=0;i<seq.length;i++) if (!lesson.showKeys) { bubbles[i].classList.add('hid','big'); bubbles[i].textContent = '?'; }
+  seq.forEach((m,i) => {
+    tone(m, 0.6, start + i*step);
+    demoTimers.push(setTimeout(() => {
+      if (lesson.showKeys){ flashKey(m, 'down', 450); reveal(i); }
+      bubbles[i].classList.add('ping'); setTimeout(() => bubbles[i]?.classList.remove('ping'), 400);
+    }, (start + i*step)*1000));
+  });
+  demoTimers.push(setTimeout(() => { busy = false; earView('turn'); }, (start + seq.length*step)*1000));
+}
+function earInput(m){
+  const target = seq[idx], bubbles = $('lane').children;
+  if (matches(m, target)){
+    flashKey(target, 'good', 300); reveal(idx); bubbles[idx].classList.add('done');
+    idx++;
+    if (idx < seq.length){ say(`${praise()} Còn ${seq.length-idx} nốt.`, 'good'); return; }
+    ear.round++;
+    if (ear.round >= lesson.rounds){ finish(); return; }
+    say('Giỏi quá! Nghe vòng tiếp theo nhé.', 'good');
+    busy = true; demoTimers.push(setTimeout(earStartRound, 1400));
+    return;
+  }
+  mistakes++; flashKey(m, 'wrong', 400); shakeCur();
+  say(`Chưa đúng, nốt đó là ${noteName(target)}. Nghe lại nhé!`, 'bad');
+  idx = 0; busy = true;
+  demoTimers.push(setTimeout(() => { for (const b of bubbles) b.classList.remove('done'); earDemo(); }, 1600));
+}
+
+/* ---------------- Nút điều khiển ---------------- */
 function playPhrase(){
   stopDemo();
   let end = idx + 1;
-  while (end < song.seq.length && !song.breaks.has(end)) end++;
+  while (end < seq.length && !breaks.has(end)) end++;
   const step = 0.5, bubbles = $('lane').children;
   for (let i=idx, k=0; i<end; i++, k++){
-    tone(song.seq[i], 0.6, k*step);
-    demoTimers.push(setTimeout(() => { flashKey(song.seq[i], 'down', 300); bubbles[i]?.classList.add('shake'); setTimeout(()=>bubbles[i]?.classList.remove('shake'),350); }, k*step*1000));
+    tone(seq[i], 0.6, k*step);
+    demoTimers.push(setTimeout(() => { flashKey(seq[i], 'down', 300); bubbles[i]?.classList.add('ping'); setTimeout(()=>bubbles[i]?.classList.remove('ping'),350); }, k*step*1000));
   }
 }
 function finish(){
-  playing = false; updateTarget();
+  playing = false; stopDemo();
+  if (lesson.kind !== 'ear') { idx = seq.length; updateTarget(); }
+  else { $('count').textContent = `${lesson.rounds}/${lesson.rounds}`; $('prog').style.width = '100%'; }
   const stars = mistakes <= 1 ? 3 : mistakes <= 4 ? 2 : 1;
-  if (stars > store.get('best:'+song.id, 0)) store.set('best:'+song.id, stars);
+  if (stars > store.get('best:'+lesson.id, 0)) store.set('best:'+lesson.id, stars);
   [60,64,67,72].forEach((m,i) => tone(m, 0.8, i*0.12));
   $('done-stars').innerHTML = '★'.repeat(stars) + `<span class="off">${'★'.repeat(3-stars)}</span>`;
   $('done-title').textContent = stars===3 ? 'Xuất sắc!' : stars===2 ? 'Giỏi lắm!' : 'Hoàn thành!';
   $('done-text').textContent = mistakes===0 ? 'Bé không đánh sai nốt nào.' : `Bé đánh sai ${mistakes} lần. Chơi lại để được thêm sao nhé!`;
-  $('next').hidden = song.index >= SONGS.length-1;
+  $('next').hidden = lesson.index >= catOf(lesson.cat).items.length-1;
   $('done').hidden = false;
 }
-$('hear-note').addEventListener('click', () => { if (song && song.seq[idx]!=null){ tone(song.seq[idx], 1.0); flashKey(song.seq[idx],'down',300);} });
-$('hear-phrase').addEventListener('click', () => { if (song && idx < song.seq.length) playPhrase(); });
-$('restart').addEventListener('click', () => { stopDemo(); startSong(song.index); });
-$('back').addEventListener('click', () => { stopDemo(); playing = false; renderLessons(); show('home'); wakeLock?.release?.(); });
-$('again').addEventListener('click', () => { $('done').hidden = true; startSong(song.index); });
-$('next').addEventListener('click', () => { $('done').hidden = true; startSong(song.index+1); });
-$('to-list').addEventListener('click', () => { $('done').hidden = true; playing = false; renderLessons(); show('home'); });
+function toList(){ stopDemo(); playing = false; tab = lesson?.cat || tab; renderTabs(); renderLessons(); show('home'); wakeLock?.release?.(); }
+$('hear-note').addEventListener('click', () => {
+  if (!lesson) return;
+  if (lesson.kind === 'ear'){ if (!busy && playing){ idx = 0; for (const b of $('lane').children) b.classList.remove('done'); earDemo(); } return; }
+  if (seq[idx] != null){ tone(seq[idx], 1.0); flashKey(seq[idx],'down',300); }
+});
+$('hear-phrase').addEventListener('click', () => { if (lesson && idx < seq.length) playPhrase(); });
+$('restart').addEventListener('click', () => startLesson(lesson.cat, lesson.index));
+$('back').addEventListener('click', toList);
+$('again').addEventListener('click', () => { $('done').hidden = true; startLesson(lesson.cat, lesson.index); });
+$('next').addEventListener('click', () => { $('done').hidden = true; startLesson(lesson.cat, lesson.index+1); });
+$('to-list').addEventListener('click', () => { $('done').hidden = true; toList(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && playing) keepAwake(); });
 
 /* ---------------- Khởi động ---------------- */
-buildKeyboard(); renderLessons(); markMode(); drawStaff(null);
+if (!catOf(tab)) tab = 'finger';
+renderTabs(); renderLessons(); markMode(); drawStaff(null);
 if (mode === 'tap') setStatus('Bé bấm phím trên màn hình. Mỗi phím có màu và tên nốt.', 'ok');
 else if (mode) setStatus(`Lần trước dùng: ${mode==='mic'?'Micro':'Dây MIDI'}. Bấm lại ô đó để nối, hoặc chọn bài để bắt đầu.`);
 </script>
